@@ -2,7 +2,7 @@
 
 ## Video de YouTube
 
-[Ver video](|Link de video de youtube|)
+[Ver video](|[Link de video de youtube](https://youtu.be/OiYRR0Jre5E)|)
 
 ## Colaboradores
 - [Poncho Ajmv](https://github.com/poncho-ajmv)
