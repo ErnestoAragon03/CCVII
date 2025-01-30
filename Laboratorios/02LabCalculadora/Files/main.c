@@ -22,7 +22,7 @@ void main() {
 
     while (1) {
         PRINT("Ingrese un dato (puede ser entero, flotante o texto): ");
-        uart_gets_input(input_buffer, sizeof(input_buffer));
+        READ("%s", input_buffer);
 
         if ((input_buffer[0] >= '0' && input_buffer[0] <= '9') || input_buffer[0] == '-') {
             if (contains_decimal_point(input_buffer)) {
@@ -31,16 +31,16 @@ void main() {
                 int1 = uart_atoi(input_buffer);
             }
 
+            
             PRINT("Seleccione operacion (+, -, *, /): ");
             uart_gets_input(&operation, 2);
 
             if (contains_decimal_point(input_buffer)) {
-                PRINT("Primer numero flotante detectado: ");
                 uart_ftoa(float1, result_buffer);
                 PRINT("%s\n", result_buffer);
 
                 PRINT("Ingrese el segundo numero flotante: ");
-                uart_gets_input(input_buffer, sizeof(input_buffer));
+                READ("%s", input_buffer);
                 float2 = uart_atof(input_buffer);
                 uart_ftoa(float2, result_buffer);
                 PRINT("Segundo numero flotante detectado: %s\n", result_buffer);
@@ -55,19 +55,16 @@ void main() {
                 
                 PRINT("Resultado: "); uart_ftoa(float_result, result_buffer); PRINT("%s\n", result_buffer);
             } else {
-               
-
                 PRINT("\nIngrese el segundo numero entero: ");
-                uart_gets_input(input_buffer, sizeof(input_buffer));
+                READ("%s", input_buffer);
                 int2 = uart_atoi(input_buffer);
                 
-
                 switch (operation) {
                     case '+': int_result = int1 + int2; break;
                     case '-': int_result = int1 - int2; break;
                     case '*': int_result = int1 * int2; break;
                     case '/': int_result = (int2 != 0) ? int1 / int2 : 0; break;
-                    default: PRINT("Operacionn no valida.\n"); continue;
+                    default: PRINT("Operacion no valida.\n"); continue;
                 }
                 
                 PRINT("Resultado: %d\n", int_result);
