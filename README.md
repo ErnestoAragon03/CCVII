@@ -1,5 +1,9 @@
 # Laboratorio 001: Calculadora en ARM Bare-Metal
 
+## Video de YouTube
+
+[Ver video](|Link de video de youtube|)
+
 ## Colaboradores
 - [Poncho Ajmv](https://github.com/poncho-ajmv)
 - [Ernesto Aragon](https://github.com/ErnestoAragon03)
