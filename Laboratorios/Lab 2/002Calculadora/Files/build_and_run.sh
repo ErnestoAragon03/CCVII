@@ -20,9 +20,4 @@ echo "Converting ELF to binary..."
 arm-none-eabi-objcopy -O binary calculadora.elf calculadora.bin
 
 echo "Running QEMU..."
-docker run --rm -it -v "$(pwd)":/workspace qemux/qemu-arm qemu-system-arm \
--M versatilepb \
--m 128M \
--nographic \
--echr 0x14 \
--kernel /workspace/calculadora.bin
+qemu-system-arm -M versatilepb -nographic -kernel calculadora.elf

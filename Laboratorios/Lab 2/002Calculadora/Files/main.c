@@ -1,135 +1,81 @@
-#define UART0_BASE 0x101f1000
+#include "stdio.h"
+#include "stdio.c"
 
-#define UART_DR      0x00  // Data Register
-#define UART_FR      0x18  // Flag Register
-#define UART_FR_TXFF 0x20  // Transmit FIFO Full
-#define UART_FR_RXFE 0x10  // Receive FIFO Empty
-
-volatile unsigned int * const UART0 = (unsigned int *)UART0_BASE;
-
-// Function to send a single character via UART
-void uart_putc(char c) {
-    // Wait until there is space in the FIFO
-    while (UART0[UART_FR / 4] & UART_FR_TXFF);
-    UART0[UART_DR / 4] = c;
-}
-
-// Function to receive a single character via UART
-char uart_getc() {
-    // Wait until data is available
-    while (UART0[UART_FR / 4] & UART_FR_RXFE);
-    return (char)(UART0[UART_DR / 4] & 0xFF);
-}
-
-// Function to send a string via UART
-void uart_puts(const char *s) {
+int contains_decimal_point(const char *s) {
     while (*s) {
-        uart_putc(*s++);
-    }
-}
-
-// Function to receive a line of input via UART
-void uart_gets_input(char *buffer, int max_length) {
-    int i = 0;
-    char c;
-    while (i < max_length - 1) { // Leave space for null terminator
-        c = uart_getc();
-        if (c == '\n' || c == '\r') {
-            uart_putc('\n'); // Echo newline
-            break;
+        if (*s == '.') {
+            return 1;
         }
-        uart_putc(c); // Echo character
-        buffer[i++] = c;
+        s++;
     }
-    buffer[i] = '\0'; // Null terminate the string
-}
-
-// Simple function to convert string to integer
-int uart_atoi(const char *s) {
-    int num = 0;
-    int sign = 1;
-    int i = 0;
-
-    // Handle optional sign
-    if (s[i] == '-') {
-        sign = -1;
-        i++;
-    }
-
-    for (; s[i] >= '0' && s[i] <= '9'; i++) {
-        num = num * 10 + (s[i] - '0');
-    }
-
-    return sign * num;
-}
-
-// Function to convert integer to string
-void uart_itoa(int num, char *buffer) {
-    int i = 0;
-    int is_negative = 0;
-
-    if (num == 0) {
-        buffer[i++] = '0';
-        buffer[i] = '\0';
-        return;
-    }
-
-    if (num < 0) {
-        is_negative = 1;
-        num = -num;
-    }
-
-    while (num > 0 && i < 14) { // Reserve space for sign and null terminator
-        buffer[i++] = '0' + (num % 10);
-        num /= 10;
-    }
-
-    if (is_negative) {
-        buffer[i++] = '-';
-    }
-
-    buffer[i] = '\0';
-
-    // Reverse the string
-    int start = 0, end = i - 1;
-    char temp;
-    while (start < end) {
-        temp = buffer[start];
-        buffer[start] = buffer[end];
-        buffer[end] = temp;
-        start++;
-        end--;
-    }
+    return 0;
 }
 
 void main() {
-    char input1[16];
-    char input2[16];
-    char result_str[16];
-    int num1, num2, sum;
+    int int1 = 0, int2 = 0, int_result = 0;
+    float float1 = 0, float2 = 0, float_result = 0;
+    char input_buffer[100];
+    char result_buffer[32];
+    char operation;
 
-    uart_puts("Program: Add Two Numbers\n");
+    PRINT("Inicia programa...\n");
 
     while (1) {
-        // Prompt for first number
-        uart_puts("Enter first number: ");
-        uart_gets_input(input1, sizeof(input1));
-        num1 = uart_atoi(input1);
+        PRINT("Ingrese un dato (puede ser entero, flotante o texto): ");
+        uart_gets_input(input_buffer, sizeof(input_buffer));
 
-        // Prompt for second number
-        uart_puts("Enter second number: ");
-        uart_gets_input(input2, sizeof(input2));
-        num2 = uart_atoi(input2);
+        if ((input_buffer[0] >= '0' && input_buffer[0] <= '9') || input_buffer[0] == '-') {
+            if (contains_decimal_point(input_buffer)) {
+                float1 = uart_atof(input_buffer);
+            } else {
+                int1 = uart_atoi(input_buffer);
+            }
 
-        // Calculate sum
-        sum = num1 + num2;
+            PRINT("Seleccione operacion (+, -, *, /): ");
+            uart_gets_input(&operation, 2);
 
-        // Convert sum to string
-        uart_itoa(sum, result_str);
+            if (contains_decimal_point(input_buffer)) {
+                PRINT("Primer numero flotante detectado: ");
+                uart_ftoa(float1, result_buffer);
+                PRINT("%s\n", result_buffer);
 
-        // Display the result
-        uart_puts("Sum: ");
-        uart_puts(result_str);
-        uart_putc('\n');
+                PRINT("Ingrese el segundo numero flotante: ");
+                uart_gets_input(input_buffer, sizeof(input_buffer));
+                float2 = uart_atof(input_buffer);
+                uart_ftoa(float2, result_buffer);
+                PRINT("Segundo numero flotante detectado: %s\n", result_buffer);
+
+                switch (operation) {
+                    case '+': float_result = float1 + float2; break;
+                    case '-': float_result = float1 - float2; break;
+                    case '*': float_result = float1 * float2; break;
+                    case '/': float_result = (float2 != 0) ? float1 / float2 : 0; break;
+                    default: PRINT("Operacion no valida.\n"); continue;
+                }
+                
+                PRINT("Resultado: "); uart_ftoa(float_result, result_buffer); PRINT("%s\n", result_buffer);
+            } else {
+               
+
+                PRINT("\nIngrese el segundo numero entero: ");
+                uart_gets_input(input_buffer, sizeof(input_buffer));
+                int2 = uart_atoi(input_buffer);
+                
+
+                switch (operation) {
+                    case '+': int_result = int1 + int2; break;
+                    case '-': int_result = int1 - int2; break;
+                    case '*': int_result = int1 * int2; break;
+                    case '/': int_result = (int2 != 0) ? int1 / int2 : 0; break;
+                    default: PRINT("Operacionn no valida.\n"); continue;
+                }
+                
+                PRINT("Resultado: %d\n", int_result);
+            }
+        } else {
+            PRINT("Cadena ingresada: %s\n", input_buffer);
+        }
+
+        PRINT("------------------------------------------------\n");
     }
 }
