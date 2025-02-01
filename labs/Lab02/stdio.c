@@ -1,20 +1,7 @@
 #include "stdio.h"
 #include "os.h"
+#include "os.c"
 #include <stdarg.h> //manejar argumentos variables en funciones
-
-//va_list → Define la lista de argumentos.
-//va_start() → Inicia la lectura de argumentos.
-//va_arg() → Obtiene el siguiente argumento.
-//va_end() → Finaliza la lectura de argumentos.
-
-#define UART0_BASE 0x101f1000
-
-#define UART_DR      0x00  // Data Register escriben/leen los datos
-#define UART_FR      0x18  // Flag Register si el buffer de transmisión está lleno o el de recepción está vacío
-#define UART_FR_TXFF 0x20  // Transmit FIFO Full  si el buffer de transmisión está lleno.
-#define UART_FR_RXFE 0x10  // Receive FIFO Empty si el buffer de recepción está vacío.
- 
-volatile unsigned int *const UART0 = (unsigned int *)UART0_BASE; //permite acceder a los registros
 
 // Función PRINT
 void PRINT(const char *format, ...) {

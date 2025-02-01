@@ -15,61 +15,62 @@ void main() {
     float float1 = 0, float2 = 0, float_result = 0;
     char input_buffer[100];
     char result_buffer[32];
-    char operation;
+    char operation[5];
 
     PRINT("Inicia programa...\n");
 
     while (1) {
-        PRINT("Ingrese un dato (puede ser entero, flotante o texto): ");
-        READ("%s", input_buffer);
+        PRINT("Ingrese que tipo de datos va a ingresar: \n");
+        PRINT("1. Enteros\n");
+        PRINT("2. Flotantes\n");
+        PRINT("3. String\n");
+        READ("%d", input_buffer);
 
-        if ((input_buffer[0] >= '0' && input_buffer[0] <= '9') || input_buffer[0] == '-') {
-            if (contains_decimal_point(input_buffer)) {
-                float1 = uart_atof(input_buffer);
-            } else {
-                int1 = uart_atoi(input_buffer);
-            }
-
-            
-            PRINT("Seleccione operacion (+, -, *, /): ");
-            uart_gets_input(&operation, 2);
-
-            if (contains_decimal_point(input_buffer)) {
-                uart_ftoa(float1, result_buffer);
-                PRINT("%s\n", result_buffer);
-
-                PRINT("Ingrese el segundo numero flotante: ");
-                READ("%s", input_buffer);
-                float2 = uart_atof(input_buffer);
-                uart_ftoa(float2, result_buffer);
-                PRINT("Segundo numero flotante detectado: %s\n", result_buffer);
-
-                switch (operation) {
-                    case '+': float_result = float1 + float2; break;
-                    case '-': float_result = float1 - float2; break;
-                    case '*': float_result = float1 * float2; break;
-                    case '/': float_result = (float2 != 0) ? float1 / float2 : 0; break;
-                    default: PRINT("Operacion no valida.\n"); continue;
-                }
-                
-                PRINT("Resultado: "); uart_ftoa(float_result, result_buffer); PRINT("%s\n", result_buffer);
-            } else {
-                PRINT("\nIngrese el segundo numero entero: ");
-                READ("%s", input_buffer);
-                int2 = uart_atoi(input_buffer);
-                
-                switch (operation) {
+        switch (*input_buffer)
+        {
+            //Operaciones con enteros
+        case 1:
+            PRINT("Ingrese primer numero (entero): \n");
+            READ("%d", &int1);
+            PRINT("Seleccione operacion (+, -, *, /): \n");
+            READ("%s", &operation);
+            PRINT("Ingrese segundo numero (entero): \n");
+            READ("%d", &int2);
+            switch (*operation) {
                     case '+': int_result = int1 + int2; break;
                     case '-': int_result = int1 - int2; break;
                     case '*': int_result = int1 * int2; break;
                     case '/': int_result = (int2 != 0) ? int1 / int2 : 0; break;
-                    default: PRINT("Operacion no valida.\n"); continue;
+                    default: PRINT("Operacion invalida.\n"); continue;
                 }
-                
-                PRINT("Resultado: %d\n", int_result);
-            }
-        } else {
-            PRINT("Cadena ingresada: %s\n", input_buffer);
+            PRINT("Resultado: %d\n", int_result);
+            break;
+            //Operaciones con flotantes
+        case 2:
+            PRINT("Ingrese primer numero (flotante): \n");
+            READ("%f", &float1);
+            PRINT("Seleccione operacion (+, -, *, /): \n");
+            READ("%s", &operation);
+            PRINT("Ingrese segundo numero (flotante): \n");
+            READ("%f", &float2);
+            switch (*operation) {
+                    case '+': float_result = float1 + float2; break;
+                    case '-': float_result = float1 - float2; break;
+                    case '*': float_result = float1 * float2; break;
+                    case '/': float_result = (float2 != 0) ? float1 / float2 : 0; break;
+                    default: PRINT("Operacion invalida.\n"); continue;
+                }
+            PRINT("Resultado: %d\n", float_result);
+            break;
+            //Strings
+        case 3:
+            PRINT("Ingrese un string: ");
+            READ("%s", input_buffer);
+            PRINT("\nCadena ingresada: %s\n", input_buffer);
+            break;
+        default:
+            PRINT("Tipo de dato invalido\n");
+            break;
         }
 
         PRINT("------------------------------------------------\n");
