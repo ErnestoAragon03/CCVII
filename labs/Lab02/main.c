@@ -1,5 +1,4 @@
 #include "stdio.h"
-#include "stdio.c"
 
 int contains_decimal_point(const char *s) {
     while (*s) {
