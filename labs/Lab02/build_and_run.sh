@@ -24,7 +24,7 @@ arm-none-eabi-gcc -mcpu=arm926ej-s -mfloat-abi=soft -c main.c -o main.o
 
 # Link the object files
 echo "Linking object files..."
-arm-none-eabi-gcc -mcpu=arm926ej-s -mfloat-abi=soft -nostartfiles -T linker.ld -o calculadora.elf root.o main.o stdio.a -lc -lm
+arm-none-eabi-gcc -mcpu=arm926ej-s -mfloat-abi=soft -nostartfiles -T linker.ld -o calculadora.elf root.o main.o stdio.a os.a -lc -lm
 
 # Convert the ELF file to a binary
 echo "Converting ELF to binary..."

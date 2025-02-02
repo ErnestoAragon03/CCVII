@@ -1,6 +1,5 @@
 #include "stdio.h"
 #include "os.h"
-#include "os.c"
 #include <stdarg.h> //manejar argumentos variables en funciones
 
 // Función PRINT
@@ -28,7 +27,6 @@ void PRINT(const char *format, ...) {
                     double num = va_arg(args, double);
                     char buffer[32];
                     uart_ftoa(num, buffer);
-                    //uart_scaled_itoa(num, buffer, 100); // Escala para 2 decimales
                     uart_puts(buffer);
                     break;
                 }
