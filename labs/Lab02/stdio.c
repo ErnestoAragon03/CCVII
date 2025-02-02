@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "os.h"
+#include "utils.h"
 #include <stdarg.h> //manejar argumentos variables en funciones
 
 // Función PRINT

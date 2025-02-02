@@ -12,9 +12,13 @@ echo "Assembling startup.s..."
 arm-none-eabi-as -o root.o root.s
 
 # Compile the libraries
-echo "Compiling Language Libraries..."
+# OS
 arm-none-eabi-gcc -mcpu=arm926ej-s -mfloat-abi=soft -c os.c -o os.o
 arm-none-eabi-ar rcs os.a os.o
+# UTILS
+arm-none-eabi-gcc -mcpu=arm926ej-s -mfloat-abi=soft -c utils.c -o utils.o
+arm-none-eabi-ar rcs utils.a utils.o
+# STDIO
 arm-none-eabi-gcc -mcpu=arm926ej-s -mfloat-abi=soft -c stdio.c -o stdio.o
 arm-none-eabi-ar rcs stdio.a stdio.o
 
@@ -24,7 +28,7 @@ arm-none-eabi-gcc -mcpu=arm926ej-s -mfloat-abi=soft -c main.c -o main.o
 
 # Link the object files
 echo "Linking object files..."
-arm-none-eabi-gcc -mcpu=arm926ej-s -mfloat-abi=soft -nostartfiles -T linker.ld -o calculadora.elf root.o main.o stdio.a -lc -lm
+arm-none-eabi-gcc -mcpu=arm926ej-s -mfloat-abi=soft -nostartfiles -T linker.ld -o calculadora.elf root.o main.o stdio.a os.a utils.a -lc -lm
 
 # Convert the ELF file to a binary
 echo "Converting ELF to binary..."
