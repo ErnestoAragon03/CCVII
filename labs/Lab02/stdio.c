@@ -25,9 +25,10 @@ void PRINT(const char *format, ...) {
                     break;
                 }
                 case 'f': {
-                    int num = va_arg(args, int);
+                    double num = va_arg(args, double);
                     char buffer[32];
-                    uart_scaled_itoa(num, buffer, 100); // Escala para 2 decimales
+                    uart_ftoa(num, buffer);
+                    //uart_scaled_itoa(num, buffer, 100); // Escala para 2 decimales
                     uart_puts(buffer);
                     break;
                 }

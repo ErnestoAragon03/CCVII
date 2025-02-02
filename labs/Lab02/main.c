@@ -60,7 +60,7 @@ void main() {
                     case '/': float_result = (float2 != 0) ? float1 / float2 : 0; break;
                     default: PRINT("Operacion invalida.\n"); continue;
                 }
-            PRINT("Resultado: %d\n", float_result);
+            PRINT("Resultado: %f\n", float_result);
             break;
             //Strings
         case 3:
