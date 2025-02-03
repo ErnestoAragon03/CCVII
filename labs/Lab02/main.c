@@ -1,14 +1,5 @@
 #include "stdio.h"
-
-int contains_decimal_point(const char *s) {
-    while (*s) {
-        if (*s == '.') {
-            return 1;
-        }
-        s++;
-    }
-    return 0;
-}
+#include "os.h"
 
 void main() {
     int int1 = 0, int2 = 0, int_result = 0;
@@ -17,7 +8,11 @@ void main() {
     char result_buffer[32];
     char operation[5];
 
-    PRINT("Inicia programa...\n");
+    PRINT("Iniciando programa...\n");
+    timer_setup(2000);     //Configurar timer
+    PRINT("Habilitando IRQs...\n");
+    enable_timer_irq();    //Habilitar interrupciones de timer
+    PRINT("Se han habilitado las IRQs\n");
 
     while (1) {
         PRINT("Ingrese que tipo de datos va a ingresar: \n");

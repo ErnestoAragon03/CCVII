@@ -9,16 +9,11 @@ void uart_puts(const char *s);
 
 void uart_gets_input(char *buffer, int max_length);
 
-int uart_scaled_atoi(const char *s, int scale);
+void timer_setup(int miliseconds);
 
-void uart_scaled_itoa(int num, char *buffer, int scale);
+void enable_timer_irq();
 
-int uart_atoi(const char *s);
+void timer_isr();
 
-void uart_itoa(int num, char *buffer);
-
-float uart_atof(const char *s);
-
-void uart_ftoa(float num, char *buffer);
 
 #endif
