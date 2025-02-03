@@ -9,6 +9,7 @@
 #define TIMER_RIS       (*(volatile int *)(TIMER_BASE + 0x10))
 
 #define VIC_BASE 0x10140000
+#define VIC_IRQ_STATUS (*(volatile int *) (VIC_BASE + 0x00))
 #define PIC_VECT_ADDR (*(volatile int *) (VIC_BASE + 0x30))
 
 void main() {
@@ -24,11 +25,23 @@ void main() {
     enable_timer_irq();    //Habilitar interrupciones de timer
     PRINT("Se han habilitado las IRQs\n");
 
+    PRINT("Status de banderas: %d\n", VIC_IRQ_STATUS);
+
     PRINT("Tiempo restante: %d\n", TIMER_VALUE);
+    timer_isr();
+
+    
+    PRINT("Status de banderas: %d\n", VIC_IRQ_STATUS);
 
     while (1) {
-        //PRINT("Tiempo restante: %d\n", TIMER_VALUE);
+        if(VIC_IRQ_STATUS == 16){
+            timer_isr();
+        }
+        PRINT("Tiempo restante: %d\n", get_timer_value());
+        for (volatile int i = 0; i < 99999999; i++);  // Pequeña pausa
+        //PRINT("Status de banderas: %d\n", VIC_IRQ_STATUS);
         //PRINT("Estado de PIC_VECT_ADDR: %d\n", PIC_VECT_ADDR);
+        
         //for (volatile int i = 0; i < 500000; i++);  // Pequeña pausa
         /*
         PRINT("Tiempo restante: %d\n", TIMER_VALUE);

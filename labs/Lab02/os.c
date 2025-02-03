@@ -9,16 +9,23 @@
 
 //Direcciones de los Timers (Para Versatile Application Baseboard for ARM926EJ-S)
 #define TIMER_0 0x101E2000
-#define TIMER_0_LOAD (*(volatile int *) (TIMER_0 + 0x00))
-#define TIMER_0_CTRL (*(volatile int *) (TIMER_0 + 0x08))
-#define TIMER_0_CLR (*(volatile int *) (TIMER_0 + 0x0c))
+#define TIMER_0_LOAD (*(volatile unsigned int *) (TIMER_0 + 0x00))
+#define TIMER_0_VALUE (*(volatile unsigned int *) (TIMER_0 + 0X04))
+#define TIMER_0_CTRL (*(volatile unsigned int *) (TIMER_0 + 0x08))
+#define TIMER_0_CLR (*(volatile unsigned int *) (TIMER_0 + 0x0c))
+#define TIMER_0_RIS (*(volatile unsigned int *) (TIMER_0 + 0X10))
+#define TIMER_0_MIS (*(volatile unsigned int *) (TIMER_0 + 0X14))
 
 //Dirección Base del Vector Interrupt Controller (VIC)
 #define VIC_BASE 0x10140000
-#define PIC_INT_STATUS (*(volatile int *) (VIC_BASE + 0x00))
-#define PIC_INT_ENABLE (*(volatile int *) (VIC_BASE + 0x10))
-#define PIC_INT_SELECT (*(volatile int *) (VIC_BASE + 0x0c))
-#define PIC_VECT_ADDR (*(volatile int *) (VIC_BASE + 0x30))
+#define VIC_INT_STATUS (*(volatile unsigned int *) (VIC_BASE + 0x00))
+#define VIC_INT_ENABLE (*(volatile unsigned int *) (VIC_BASE + 0x10))
+#define VIC_INT_CLR (*(volatile unsigned int *) (VIC_BASE + 0x14))
+#define VIC_SOFT_INT_CLEAR (*(volatile unsigned int *) (VIC_BASE + 0x1C))
+#define VIC_INT_SELECT (*(volatile unsigned int *) (VIC_BASE + 0x0c))
+#define VIC_VECT_ADDR (*(volatile unsigned int *) (VIC_BASE + 0x30))
+
+#define TIMER_IRQ (1 << 4)
  
 volatile unsigned int *const UART0 = (unsigned int *)UART0_BASE; //permite acceder a los registros
 
@@ -68,7 +75,7 @@ void timer_setup(int miliseconds){
     //Escalar Valor de miliseconds (32*10^3)
     //miliseconds *= 100;
     //Cargar Valor en Timer
-    TIMER_0_LOAD = miliseconds;
+    TIMER_0_LOAD = miliseconds * 100;
     //Configurar Timer
     TIMER_0_CTRL = (1<<7) | (1<<6) | (1<<5) | (1<<1);     //TimerEn, TimerMode, IntEnable, TimerSize
 
@@ -77,13 +84,17 @@ void timer_setup(int miliseconds){
 //Configure VIC for Interrupt Handling
 void enable_timer_irq(){
     //Habilitar IRQ #4 (Timer IRQ) en el VIC
-    PIC_INT_ENABLE = (1<<3);
-    //Asegurarse que la interrupción sea IRQ y no FIQ
-    PIC_INT_SELECT &= ~(1<<3);
+    VIC_INT_ENABLE = TIMER_IRQ;
+    //Habilitar IRQ #4 en el Masked Interrupt Status register
+    TIMER_0_MIS = TIMER_IRQ;
 }
 
 void timer_isr(){
     //Limpiar Banderas de interrupción
     TIMER_0_CLR = 1;
-    uart_puts("¡Interrupción de Timer activada!");
+    uart_puts("Interrupcion de Timer activada!\n");
+}
+
+unsigned int get_timer_value(){
+    return TIMER_0_VALUE;
 }

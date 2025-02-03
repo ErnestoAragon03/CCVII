@@ -22,20 +22,20 @@ irq_handler:
     push {r0-r12, lr}
 
     ldr r0, =0x10140000     // Load base address of VIC
-    ldr r1, [R0]            // Read VIC_IRQ_STATUS 
+    ldr r1, [r0]            // Read VIC_IRQ_STATUS 
     cmp r1, #0
-    beq timer_irq_handler   //No IRQ active
+    beq irq_done            // No IRQ active, exit
 
-    tst r1, #(1 << 4)       //Verify if is a Timer interruption
-    bne timer_irq_handler
-
-irq_done:
-    pop {r0-r12, lr}        //Restore register values
-    subs pc, lr, #0         //Return from the interruption
+    tst r1, #(1 << 4)       // Check if Timer interrupt is active
+    beq irq_done            // If not, exit
 
 timer_irq_handler:
-    bl timer_isr            //Call the ISR from os.c
-    ldr r0, =0x10140030     //VIC_VEC_ADDR 
-    str r1, [R0]            //Clean interruption in VIC
-    b irq_done              //Finish IRQ
+    bl timer_isr            // Call the ISR from os.c
+    ldr r0, =0x10140030     // VIC_VEC_ADDR
+    mov r1, #0              // Any value to acknowledge the IRQ
+    str r1, [r0]            // Clear the interrupt in VIC
+
+irq_done:
+    pop {r0-r12, lr}        // Restore register values
+    subs pc, lr, #0         // Return from the interruption
 

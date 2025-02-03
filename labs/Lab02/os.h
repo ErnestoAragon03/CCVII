@@ -15,5 +15,7 @@ void enable_timer_irq();
 
 void timer_isr();
 
+unsigned int get_timer_value();
+
 
 #endif
