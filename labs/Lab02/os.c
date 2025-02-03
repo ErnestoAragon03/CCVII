@@ -66,11 +66,9 @@ void timer_setup(int miliseconds){
         miliseconds: Time that the timer should wait
     */
     //Escalar Valor de miliseconds (32*10^3)
-    miliseconds *= 32000;
+    //miliseconds *= 100;
     //Cargar Valor en Timer
     TIMER_0_LOAD = miliseconds;
-    //Limpiar bandera de interrupción
-    TIMER_0_CLR = 1;
     //Configurar Timer
     TIMER_0_CTRL = (1<<7) | (1<<6) | (1<<5) | (1<<1);     //TimerEn, TimerMode, IntEnable, TimerSize
 
@@ -79,9 +77,9 @@ void timer_setup(int miliseconds){
 //Configure VIC for Interrupt Handling
 void enable_timer_irq(){
     //Habilitar IRQ #4 (Timer IRQ) en el VIC
-    PIC_INT_ENABLE |= (1<<4);
+    PIC_INT_ENABLE = (1<<3);
     //Asegurarse que la interrupción sea IRQ y no FIQ
-    PIC_INT_SELECT &= ~(1<<4);
+    PIC_INT_SELECT &= ~(1<<3);
 }
 
 void timer_isr(){

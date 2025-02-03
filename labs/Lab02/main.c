@@ -1,6 +1,16 @@
 #include "stdio.h"
 #include "os.h"
 
+#define TIMER_BASE      0x101E2000
+#define TIMER_LOAD      (*(volatile int *)(TIMER_BASE + 0x00))
+#define TIMER_VALUE     (*(volatile int *)(TIMER_BASE + 0x04))
+#define TIMER_CONTROL   (*(volatile int *)(TIMER_BASE + 0x08))
+#define TIMER_INTCLR    (*(volatile int *)(TIMER_BASE + 0x0C))
+#define TIMER_RIS       (*(volatile int *)(TIMER_BASE + 0x10))
+
+#define VIC_BASE 0x10140000
+#define PIC_VECT_ADDR (*(volatile int *) (VIC_BASE + 0x30))
+
 void main() {
     int int1 = 0, int2 = 0, int_result = 0;
     float float1 = 0, float2 = 0, float_result = 0;
@@ -14,7 +24,14 @@ void main() {
     enable_timer_irq();    //Habilitar interrupciones de timer
     PRINT("Se han habilitado las IRQs\n");
 
+    PRINT("Tiempo restante: %d\n", TIMER_VALUE);
+
     while (1) {
+        //PRINT("Tiempo restante: %d\n", TIMER_VALUE);
+        //PRINT("Estado de PIC_VECT_ADDR: %d\n", PIC_VECT_ADDR);
+        //for (volatile int i = 0; i < 500000; i++);  // Pequeña pausa
+        /*
+        PRINT("Tiempo restante: %d\n", TIMER_VALUE);
         PRINT("Ingrese que tipo de datos va a ingresar: \n");
         PRINT("1. Enteros\n");
         PRINT("2. Flotantes\n");
@@ -68,6 +85,6 @@ void main() {
             break;
         }
 
-        PRINT("------------------------------------------------\n");
+        PRINT("------------------------------------------------\n");*/
     }
 }
