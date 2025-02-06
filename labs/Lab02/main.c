@@ -38,7 +38,7 @@ void main() {
             timer_isr();
         }
         PRINT("Tiempo restante: %d\n", get_timer_value());
-        for (volatile int i = 0; i < 99999999; i++);  // Pequeña pausa
+        //for (volatile int i = 0; i < 99999999; i++);  // Pequeña pausa
         //PRINT("Status de banderas: %d\n", VIC_IRQ_STATUS);
         //PRINT("Estado de PIC_VECT_ADDR: %d\n", PIC_VECT_ADDR);
         

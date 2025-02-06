@@ -4,12 +4,13 @@
 // Dirección de la VIT
 .global vector_table
 vector_table:
-    b irq_handler    // IRQ (Normal interruption)
+    bl irq_handler    // IRQ (Normal interruption)
 
 _start:
     b reset
 
 reset:
+    msr cpsr_c, vector_table       
     ldr sp, =0x00020000   // Set up stack pointer (within RAM)
     bl main               // Call the main function
 
