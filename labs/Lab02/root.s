@@ -1,5 +1,6 @@
 .section .text
 .global _start
+.extern timer_isr
 
 // Dirección de la VIT
 .global vector_table
@@ -28,7 +29,7 @@ irq_handler:
     beq irq_done            // No IRQ active, exit
 
     tst r1, #(1 << 4)       // Check if Timer interrupt is active
-    beq irq_done            // If not, exit
+    beq timer_irq_handler            // If not, exit
 
 timer_irq_handler:
     bl timer_isr            // Call the ISR from os.c
@@ -39,4 +40,3 @@ timer_irq_handler:
 irq_done:
     pop {r0-r12, lr}        // Restore register values
     subs pc, lr, #0         // Return from the interruption
-

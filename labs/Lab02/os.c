@@ -93,6 +93,7 @@ void timer_isr(){
     //Limpiar Banderas de interrupción
     TIMER_0_CLR = 1;
     uart_puts("Interrupcion de Timer activada!\n");
+    return;
 }
 
 unsigned int get_timer_value(){

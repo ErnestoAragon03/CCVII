@@ -20,25 +20,14 @@ void main() {
     char operation[5];
 
     PRINT("Iniciando programa...\n");
-    timer_setup(2000);     //Configurar timer
+    timer_setup(20000);     //Configurar timer
     PRINT("Habilitando IRQs...\n");
     enable_timer_irq();    //Habilitar interrupciones de timer
     PRINT("Se han habilitado las IRQs\n");
 
-    PRINT("Status de banderas: %d\n", VIC_IRQ_STATUS);
-
-    PRINT("Tiempo restante: %d\n", TIMER_VALUE);
-    timer_isr();
-
-    
-    PRINT("Status de banderas: %d\n", VIC_IRQ_STATUS);
-
     while (1) {
-        if(VIC_IRQ_STATUS == 16){
-            timer_isr();
-        }
         PRINT("Tiempo restante: %d\n", get_timer_value());
-        //for (volatile int i = 0; i < 99999999; i++);  // Pequeña pausa
+        for (volatile int i = 0; i < 9999999; i++);  // Pequeña pausa
         //PRINT("Status de banderas: %d\n", VIC_IRQ_STATUS);
         //PRINT("Estado de PIC_VECT_ADDR: %d\n", PIC_VECT_ADDR);
         
