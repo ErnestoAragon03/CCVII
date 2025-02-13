@@ -3,7 +3,7 @@
 **Sistemas Operativos (Windows/Linux)**  
 
 ## Video de YouTube
-[Ver video](||)
+[Ver video](|https://youtu.be/3NmrUggLGXI|)
 ---
 
 ---
