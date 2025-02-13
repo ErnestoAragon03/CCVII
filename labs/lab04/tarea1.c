@@ -12,6 +12,7 @@ int main() {
         return 1;
     } else if (pid == 0) { //proceso hijo
         printf("[Hijo]  PID: %d, PPID: %d\n", getpid(), getppid());
+    
     } else {
         sleep(1); //proceso padre 
         printf("[Padre] PID: %d\n", getpid());

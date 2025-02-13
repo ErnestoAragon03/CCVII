@@ -16,18 +16,18 @@ int main() {
         return 1;
     }
 
-    pid_t pid = fork();
+    pid_t pid = fork(); 
     
     //hijo
     if (pid == 0) {
-        close(fd[1]); // Cierra el extremo dfe  write
+        close(fd[1]); // Cierra el extremo de  write
         read(fd[0], buffer, sizeof(buffer)); //leemos
         printf("[Hijo] Recibido: %s\n", buffer);
         close(fd[0]);
     } 
     //padrfe
     else {
-        close(fd[0]); // Cierra el extremo dfe  read
+        close(fd[0]); // Cierra el extremo de  read
         write(fd[1], mensaje, strlen(mensaje) + 1); //escribimos
         printf("[Padre] Mensaje enviado\n");
         fflush(stdout);

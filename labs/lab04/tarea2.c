@@ -15,6 +15,7 @@ int main() {
     } else {
         waitpid(pid, NULL, 0); // El padre espera que el hijo termine
         printf("[Padre] Hijo %d terminado\n", pid);
+        
     }
     return 0;
 }

@@ -8,8 +8,8 @@
 
 ---
 ## **Colaboradores**
-- [Ernesto Aragon](https://github.com/ErnestoAragon03)
 - [Poncho Ajmv](https://github.com/poncho-ajmv)
+- [Ernesto Aragon](https://github.com/ErnestoAragon03)
 - [Christian Sosa](https://github.com/ChristianSosa22)
 ---
 # Administración de Procesos en Linux y Windows
@@ -23,22 +23,21 @@
 - **`shmget()` / `shmat()`**: Permiten la creación y uso de memoria compartida.
 
 
-Bibliotecas
-- **`stdio.h:`**: Para funciones de entrada/salida estándar como printf.
-- **`stdlib.h:`**: Para funciones generales, como la gestión de memoria.
-- **`string.h:`**: Para funciones de manipulación de cadenas, como strcpy.
-- **`unistd.h: `**: Para funciones de POSIX como fork y sleep.
-- **`sys/shm.h:`**: Para trabajar con memoria compartida.
-- **`sys/wait.h:`**: Para manejar la espera de procesos, como wait.
-
----
-
 ## 🔹 Windows - Funciones para Procesos
 
 - **`CreateProcess()`**: Crea un nuevo proceso hijo y ejecuta otro programa.
 - **`WaitForSingleObject()`**: Hace que el proceso padre espere a un proceso hijo.
 - **`CreatePipe()`**: Crea un canal de comunicación entre procesos.
 - **`CreateFileMapping()` / `MapViewOfFile()`**: Permiten compartir memoria entre procesos.
+---
+
+## 🔹 Bibliotecas
+- **`stdio.h:`**: Para funciones de entrada/salida estándar como printf.
+- **`stdlib.h:`**: Para funciones generales, como la gestión de memoria.
+- **`string.h:`**: Para funciones de manipulación de cadenas, como strcpy.
+- **`unistd.h: `**: Para funciones de POSIX como fork y sleep.
+- **`sys/shm.h:`**: Para trabajar con memoria compartida.
+- **`sys/wait.h:`**: Para manejar la espera de procesos, como wait.
 ---
 
 ## Tareas Principales  
