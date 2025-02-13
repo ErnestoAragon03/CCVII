@@ -22,6 +22,15 @@
 - **`pipe()`**: Crea un canal de comunicación unidireccional entre procesos.
 - **`shmget()` / `shmat()`**: Permiten la creación y uso de memoria compartida.
 
+
+Bibliotecas
+- **`stdio.h:`**: Para funciones de entrada/salida estándar como printf.
+- **`stdlib.h:`**: Para funciones generales, como la gestión de memoria.
+- **`string.h:`**: Para funciones de manipulación de cadenas, como strcpy.
+- **`unistd.h: `**: Para funciones de POSIX como fork y sleep.
+- **`sys/shm.h:`**: Para trabajar con memoria compartida.
+- **`sys/wait.h:`**: Para manejar la espera de procesos, como wait.
+
 ---
 
 ## 🔹 Windows - Funciones para Procesos
