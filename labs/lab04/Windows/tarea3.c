@@ -3,30 +3,38 @@
 #include <tchar.h>
 
 int main() {
-    // Proceso padre
-    printf("Parent Process: PID=%d\n", GetCurrentProcessId());  //Notar que es lo mismo que hacer GetProcessId(GetCurrentProcess())
+    SECURITY_ATTRIBUTES sa;
+    
+    // Configurar SECURITY_ATTRIBUTES para permitir herencia
+    sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+    sa.lpSecurityDescriptor = NULL;
+    sa.bInheritHandle = TRUE;
 
     HANDLE hReadPipe, hWritePipe;
     //Creación de Pipe para IPC
     if(CreatePipe(
         &hReadPipe,                 //Handler para lectura
         &hWritePipe,                //Handler para escritura
-        NULL,                       //Opciones de seguridad
+        &sa,                       //Opciones de seguridad
         0                           //Tamaño del buffer (0 para usar tamaño default del sistema)
     )){
         printf("Canal IPC entre Parent y Child Processes establecido con exito\n");
     } else{
         printf("No se ha podido establecer un canal IPC entre Parent y Child Processes\n");
+        return 1;
     }
     
     //Configurar STARTUPINFO del Child process para acoplarlo al Pipe
     STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-    si.hStdInput = hReadPipe;       //Leer del Pipe
-
-    // Inicializar las estructuras
     ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
+    si.cb = sizeof(STARTUPINFO);
+    si.dwFlags = STARTF_USESTDHANDLES; 
+    si.hStdInput = hReadPipe;       //Leer del Pipe
+    si.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+
+
+    PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
 
     // Crear el proceso hijo
@@ -35,7 +43,7 @@ int main() {
         _T("./child_process_3.exe"), // Nombre del programa hijo (debe estar en el mismo directorio)
         NULL,                   // Atributos de seguridad del proceso (por defecto)
         NULL,                   // Atributos de seguridad del hilo (por defecto)
-        FALSE,                  // No heredar handles
+        TRUE,                   // Heredar handles (ESTO ES IMPORTANTE EN LA TAREA 3)
         0,                      // Sin banderas de creación
         NULL,                   // Usar el entorno del padre
         NULL,                   // Usar el directorio del padre
@@ -43,11 +51,11 @@ int main() {
         &pi                     // Puntero a PROCESS_INFORMATION
     )) {        
         //Cerrar extremo de lectura del padre
-        CloseHandle(hReadPipe);
+        //CloseHandle(hReadPipe);
 
-        //Escribir en el Pipe
-        printf("Parent Process: Writing 'I forgot to remember to forget\\n'");
         const char* mensaje = "I forgot to remember to forget\n";
+        //Escribir en el Pipe
+        printf("Parent Process: %s", mensaje);
         DWORD bytesEscritos;
         WriteFile(hWritePipe,           // Handle de escritura del pipe
             mensaje,                    // Buffer con los datos de escritura
