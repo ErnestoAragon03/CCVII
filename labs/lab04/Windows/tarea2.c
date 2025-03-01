@@ -28,6 +28,18 @@ int main() {
         &pi                     // Puntero a PROCESS_INFORMATION
     )) {
         printf("Child Process ID: PID=%d      Parent PID=%d\n", pi.dwProcessId, GetCurrentProcessId());
+        
+        // Esperar a que el proceso hijo termine
+        DWORD codigo = WaitForSingleObject(pi.hProcess, INFINITE);  //Si se le quiere poner un tiempo límite reemplazar INFINITE por el tiempo deseado en milisegundos
+        if (codigo == WAIT_OBJECT_0){
+            printf("El proceso hijo ha terminado correctamente.\n");
+        }
+        else if(codigo == WAIT_TIMEOUT){
+            printf("El tiempo de espera especificado ha expirado.  El proceso hijo no se ha concluido.\n");
+        }
+        else if(codigo == WAIT_FAILED){
+            printf("Ha ocurrido un error en el proceso hijo.\n");
+        }
 
         // Cerrar los handles del proceso y del hilo
         CloseHandle(pi.hProcess);
