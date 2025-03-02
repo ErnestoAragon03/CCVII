@@ -29,5 +29,9 @@ int main() {
     //Leer lo que escribió en memoria el padre
     printf("Child Process: Read \"%s\"", (char*)pBuf);
 
+    //Liberar memoria
+    UnmapViewOfFile(pBuf);
+    CloseHandle(hMapFile);
+
     return 0;
 }
