@@ -12,14 +12,12 @@ int main() {
 
     HANDLE hReadPipe, hWritePipe;
     //Creación de Pipe para IPC
-    if(CreatePipe(
+    if(!CreatePipe(
         &hReadPipe,                 //Handler para lectura
         &hWritePipe,                //Handler para escritura
         &sa,                       //Opciones de seguridad
         0                           //Tamaño del buffer (0 para usar tamaño default del sistema)
     )){
-        printf("Canal IPC entre Parent y Child Processes establecido con exito\n");
-    } else{
         printf("No se ha podido establecer un canal IPC entre Parent y Child Processes\n");
         return 1;
     }
@@ -53,9 +51,9 @@ int main() {
         //Cerrar extremo de lectura del padre
         //CloseHandle(hReadPipe);
 
-        const char* mensaje = "I forgot to remember to forget\n";
+        const char* mensaje = "I forgot to remember to forget";
         //Escribir en el Pipe
-        printf("Parent Process: %s", mensaje);
+        printf("Parent Process: Writing \"%s\" \n", mensaje);
         DWORD bytesEscritos;
         WriteFile(hWritePipe,           // Handle de escritura del pipe
             mensaje,                    // Buffer con los datos de escritura

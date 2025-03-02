@@ -16,7 +16,7 @@ int main() {
         NULL                    // Para operaciones asincronas (NULL indica sincrono)
     )){
         buffer[bytesLeidos] == '\0';
-        printf("Child Process: Received: %s \n",buffer);
+        printf("Child Process: Received \"%s\" \n",buffer);
     } else {
         printf("Error durante la comunicacion de parte de Child");
     }
