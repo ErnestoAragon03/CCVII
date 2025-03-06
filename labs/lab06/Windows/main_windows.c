@@ -17,7 +17,9 @@ DWORD WINAPI process_file(LPVOID lpParam){
         fprintf(stderr,"[Thread ID: %lu] Error al abrir el archivo: %s\n", GetCurrentThreadId(), file_path);
         return 0;
     }
-
+    /*Tiempo de espera para simular tiempo de
+    Sleep(5000);
+    */
     //Leer número de líneas
     int line_count = 0;
     char ch;
@@ -73,6 +75,12 @@ int main(int argc, char* argv[]){
     }
     //Esperar para que los hilos terminen
     WaitForMultipleObjects(argc-1, threads, TRUE, INFINITE);
+
+    /*  Forma alternativa de Thread Joining con WaitForSingleObject
+    for (int i = 0; i < argc - 1; i++) {
+        WaitForSingleObject(threads[i], INFINITE);
+    }
+    */
 
     //Sumar conteo de líneas en cada thread
     DWORD total_lines = 0;
