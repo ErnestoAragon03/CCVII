@@ -4,17 +4,18 @@
 #include "log_processor.h"
 
 typedef struct{
-    FILE* archive;
-    long start;
-    long end;
+    char** lines;
+    int start;
+    int end;
     HashTable* ipTable;
     HashTable* urlTable;
     int* errorCount;
+    CRITICAL_SECTION* errorLock;        //Lock para el contador de errores
 } ThreadData;
 
 DWORD WINAPI startThread(LPVOID lpParam){
     ThreadData* data = (ThreadData*)lpParam;
-    read_logs_chunk(data->archive, data->start, data->end, data->ipTable, data->urlTable, data->errorCount);
+    read_logs_chunk(data->lines, data->start, data->end, data->ipTable, data->urlTable, data->errorCount, data->errorLock);
     return 0;
 }
 
@@ -46,10 +47,11 @@ void findMostVistedURL(HashTable* ht, char* mostVistedURL, int* maxVisits){
     }
 }
 
+
 int main(int argc, char* argv[]){
     //Checar argumentos
     if(argc!=2){
-        if(argc<2)printf("No se ha ingresado un log file como argumento.");
+        if(argc<2) printf("No se ha ingresado un log file como argumento.");
 
         else if(argc>2) printf("Se han ingresado argumentos demas.");
 
@@ -61,14 +63,21 @@ int main(int argc, char* argv[]){
         printf("Error al abrir el archivo %s\n",filename);
         return 1;
     }
-    //Obtener tamaño del archivo
-    fseek(archive, 0, SEEK_END);
-    long fileSize = ftell(archive);
-    fseek(archive, 0, SEEK_SET);
+    //Leer todas las líneas en el archivo
+    char** lines = NULL;
+    int numLines = 0;
+    char buffer[1024];
+    while(fgets(buffer, sizeof(buffer), archive)){
+        lines = (char**)realloc(lines, (numLines+1)* sizeof(char*));
+        lines[numLines] = strdup(buffer);   //Almacenar copia de la línea
+        numLines++;
+    }
+    //Cerrar file
+    fclose(archive);
 
     //Definir la cantidad de Threads a crear y el tamaño de los chunks
-    int numThreads = 1;
-    int chunkSize = fileSize / numThreads;
+    int numThreads = 5;
+    long chunkSize = numLines / numThreads;
 
     //Crear HashTables y contador de errores
     HashTable ipTable, urlTable;
@@ -76,24 +85,39 @@ int main(int argc, char* argv[]){
     initHash(&urlTable);
     int errorCount = 0;
 
+    //Inicializar sección crítica
+    CRITICAL_SECTION errorLock;
+    InitializeCriticalSection(&errorLock);
+
     //Crear un array de Handles y de ThreadData para los Threads
     HANDLE threads[numThreads];
     ThreadData threadData[numThreads];
 
     //Crear Threads
     for(int i=0; i<numThreads; i++){
-        threadData[i].archive = archive;
-        threadData[i].start = chunkSize*i;
-        threadData[i].end = (i == numThreads-1) ? fileSize : chunkSize*(i+1);
+        int start = i*chunkSize;
+        int end = (i == numThreads - 1) ? numLines : start + chunkSize;
+
+        threadData[i].lines = lines;
+        threadData[i].start = start;
+        threadData[i].end = end;
         threadData[i].ipTable = &ipTable;
         threadData[i].urlTable = &urlTable;
         threadData[i].errorCount = &errorCount;
+        threadData[i].errorLock = &errorLock;
+
+        if(i==0){
+            printf("theadData[%d] start: %d\n",i+1, threadData[i].start);
+            printf("theadData[%d] end: %d\n", i+1 , threadData[i].end);
+        }
         
         threads[i] = CreateThread(NULL, 0, startThread, &threadData[i], 0, NULL);
         if(!threads[i]){
             printf("Error al crear el thread\n");
             return 1;
         }
+        start = end+2;
+        //printf("start: %d\n", start);
     }
     //Esperar a que los threads terminen
     WaitForMultipleObjects(numThreads, threads, TRUE, INFINITE);
@@ -108,6 +132,19 @@ int main(int argc, char* argv[]){
     printf("Total Unique IPs: %d\n", countUniqueIPs(&ipTable));
     printf("Most Visited URL: %s (%d times)\n", mostVisitedURL, maxVisits);
     printf("HTTP Errors: %d\n", errorCount);
+
+    //Liberar memoria ocupada por las Hash Tables
+    freeHashTable(&ipTable);
+    freeHashTable(&urlTable);
+
+    //Liberar memoria de las líneas
+    for (int i=0;i<numLines;i++){
+        free(lines[i]);
+    }
+    free(lines);
+
+    //Eliminar secciones críticas
+    DeleteCriticalSection(&errorLock);
 
     return 0;
 

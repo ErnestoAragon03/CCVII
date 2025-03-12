@@ -6,7 +6,7 @@
 
 #define MAX_IP_ADDRESS_LENGTH 16
 #define MAX_URL_LENGTH 256
-#define HASH_TABLE_SIZE 1000
+#define HASH_TABLE_SIZE 6
 
 //Función para inicializar la Hash Table
 void initHash(HashTable* ht){
@@ -28,6 +28,7 @@ unsigned int hash(const char* key){
 //Insertar o actualizar en la Hash Table
 void insertOrUpdate(HashTable* ht, const char* key){
     unsigned int index = hash(key);
+    //printf("Key: %s\n", key);
 
     EnterCriticalSection(&ht->lock);  //Bloquear Sección Crítica
     
@@ -35,6 +36,7 @@ void insertOrUpdate(HashTable* ht, const char* key){
     while(current != NULL){
         if (strcmp(current->key, key)==0){
             current->value++;
+            //printf("Current: %d\n", current->value);
             LeaveCriticalSection(&ht->lock);    //Desbloquear Sección Crítica
             return;
         }
@@ -51,25 +53,40 @@ void insertOrUpdate(HashTable* ht, const char* key){
     LeaveCriticalSection(&ht->lock); //Desbloquear Sección Crítica
 }
 
-void read_logs_chunk(FILE* archive, long start, long end, HashTable* ipTable, HashTable* urlTable, int* errorCount){
-    char buffer[1024];
-    //Mover puntero al inicio de chunk
-    fseek(archive, start, SEEK_SET);
-    //Leer todo el chunk
-    while(ftell(archive) < end && fgets(buffer, sizeof(buffer), archive)){
-        char ip[MAX_IP_ADDRESS_LENGTH], url[MAX_URL_LENGTH], accion[10];
+// Función para liberar la memoria de la Hash Table
+void freeHashTable(HashTable *ht) {
+    for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+        Node *current = ht->table[i];
+        while (current != NULL) {
+            Node *temp = current;
+            current = current->next;
+            free(temp);  // Liberar cada nodo
+        }
+        ht->table[i] = NULL;  // Asegurarse de que el puntero sea NULL
+    }
+    DeleteCriticalSection(&ht->lock);  // Eliminar la sección crítica
+}
+
+
+// Función para procesar un conjunto de líneas
+void read_logs_chunk(char **lines, int inicio, int fin, HashTable *ipTable, HashTable *urlTable, int *errorCount, CRITICAL_SECTION *errorLock) {
+    for (int i = inicio; i < fin; i++) {
+        char ip[MAX_IP_LENGTH], url[MAX_URL_LENGTH], accion[10];
         int status_code;
-        //Extraer IP, URL y Status Code
-        if(sscanf(buffer, "%s - - [%*[^]]] \"%s %[^\"]\" %d", ip, accion, url, &status_code) == 4){
-            //Contar IP única
+
+        // Extraer IP, URL y Status Code
+        if (sscanf(lines[i], "%s - - [%*[^]]] \"%s %[^\"]\" %d", ip, accion, url, &status_code) == 4) {
+            // Contar IP única
             insertOrUpdate(ipTable, ip);
-            //Contar URL único
+
+            // Contar URL única
             insertOrUpdate(urlTable, url);
-            //Contar errores
-            if(status_code>=400 && status_code<=599){
-                EnterCriticalSection(&ipTable->lock); //Se usa la sección crítica de ipTable arbitrariamente para sincronizar los errores
+
+            // Contar errores
+            if (status_code >= 400 && status_code <= 599) {
+                EnterCriticalSection(errorLock);  // Bloquear la sección crítica para el contador de errores
                 (*errorCount)++;
-                LeaveCriticalSection(&ipTable->lock);
+                LeaveCriticalSection(errorLock);  // Desbloquear la sección crítica
             }
         }
     }

@@ -8,7 +8,7 @@
 
 #define MAX_IP_LENGTH 16
 #define MAX_URL_LENGTH 256
-#define HASH_TABLE_SIZE 1000
+#define HASH_TABLE_SIZE 6
 
 typedef struct Node{
     char key[MAX_URL_LENGTH];
@@ -23,6 +23,7 @@ typedef struct {
 
 void initHash(HashTable* ht);
 void insertOrUpdate(HashTable* ht, const char* key);
-void read_logs_chunk(FILE* archive, long start, long end, HashTable* ipTable, HashTable* urlTable, int* errorCount);
+void freeHashTable(HashTable *ht);
+void read_logs_chunk(char **lineas, int inicio, int fin, HashTable *ipTable, HashTable *urlTable, int *errorCount, CRITICAL_SECTION *errorLock);
 
 #endif
