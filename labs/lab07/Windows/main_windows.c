@@ -76,7 +76,7 @@ int main(int argc, char* argv[]){
     fclose(archive);
 
     //Definir la cantidad de Threads a crear y el tamaño de los chunks
-    int numThreads = 5;
+    int numThreads = 10;
     long chunkSize = numLines / numThreads;
 
     //Crear HashTables y contador de errores
@@ -105,11 +105,6 @@ int main(int argc, char* argv[]){
         threadData[i].urlTable = &urlTable;
         threadData[i].errorCount = &errorCount;
         threadData[i].errorLock = &errorLock;
-
-        if(i==0){
-            printf("theadData[%d] start: %d\n",i+1, threadData[i].start);
-            printf("theadData[%d] end: %d\n", i+1 , threadData[i].end);
-        }
         
         threads[i] = CreateThread(NULL, 0, startThread, &threadData[i], 0, NULL);
         if(!threads[i]){
@@ -121,8 +116,6 @@ int main(int argc, char* argv[]){
     }
     //Esperar a que los threads terminen
     WaitForMultipleObjects(numThreads, threads, TRUE, INFINITE);
-    
-    fclose(archive);
 
     //Variables para guarar URL mas visitada
     char mostVisitedURL[MAX_URL_LENGTH];
