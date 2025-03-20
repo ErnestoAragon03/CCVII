@@ -12,18 +12,22 @@ void DeleteBankAccount(BankAccount* account){
 }
 
 int deposit(BankAccount* account, int money){
+    int balance;
     EnterCriticalSection(&account->lock);
     account->balance += money;
+    balance = account->balance;
     LeaveCriticalSection(&account->lock);
-    return account->balance;
+    return balance;
 }
 
 int withdraw(BankAccount* account, int money){
+    int balance;
     EnterCriticalSection(&account->lock);
     if(account->balance >= money){
         account->balance -= money;
+        balance = account->balance;
         LeaveCriticalSection(&account->lock);
-        return account->balance;   //Transacción exitosa
+        return balance;   //Transacción exitosa
     }
     else{
         LeaveCriticalSection(&account->lock);
@@ -33,18 +37,15 @@ int withdraw(BankAccount* account, int money){
 
 int transfer(BankAccount* accountDeparture, BankAccount* accountDestiny, int money){
     EnterCriticalSection(&accountDeparture->lock);
+    EnterCriticalSection(&accountDestiny->lock);
+    int result = 1; //0: Transferencia exitosa 1: Transferencia fallida
     if(accountDeparture->balance >= money){
         accountDeparture->balance -= money;
-        EnterCriticalSection(&accountDestiny->lock);
         accountDestiny->balance += money;
-        LeaveCriticalSection(&accountDestiny->lock);
-        LeaveCriticalSection(&accountDeparture->lock);
-        return 0;
+        result = 0;
     }
-    //Fondos insuficientes
-    else {
-        LeaveCriticalSection(&accountDeparture->lock);
-        return -1;
-    }
+    LeaveCriticalSection(&accountDestiny->lock);
+    LeaveCriticalSection(&accountDeparture->lock);
+    return result;
     
 }

@@ -38,7 +38,7 @@ DWORD WINAPI ATMFunction(LPVOID lpParam){
         time_t now = time(NULL);
         struct tm* timeinfo = localtime(&now);
         char timestamp[20];
-        strftime(timestamp, sizeof(timestamp), "%Y-&m-%d %H:%M:%S", timeinfo);
+        strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", timeinfo);
         //Depósito
         if(transactionType == 0){
             int balance = deposit(&accounts[accountIndex], money);
@@ -69,8 +69,8 @@ DWORD WINAPI ATMFunction(LPVOID lpParam){
             }
         }
         WriteToLog(logMessage);
-        int processTime = rand() % 100; //Tiempo aleatorio para simular tiempos de carga diferentes entre transacciones
-        Sleep(processTime); //Simular tiempo de procesamiento
+        //int processTime = 100; //Tiempo aleatorio para simular tiempos de carga diferentes entre transacciones
+        //Sleep(processTime); //Simular tiempo de procesamiento
     }
     return 0;
 }
@@ -96,7 +96,16 @@ int main(){
     }
 
     //Join
-    WaitForMultipleObjects(NUM_ATMS, atmThreads, TRUE, INFINITE);
+    WaitForMultipleObjects(NUM_ATMS, atmThreads, TRUE, 5000);
+
+    char logMessage[150];  //Buffer para log
+    //Desplegar balance total
+    snprintf(logMessage, sizeof(logMessage), "\n----------Total Balances----------\n");
+        WriteToLog(logMessage);
+    for (int i = 0; i < NUM_ACCOUNTS; i++) {
+        snprintf(logMessage, sizeof(logMessage), "Account %d total Balance: $%d.00", accounts[i].accountID, accounts[i].balance);
+        WriteToLog(logMessage);
+    }
 
     //Eliminar Mutex creados
     for(int i = 0; i<NUM_ACCOUNTS; i++){

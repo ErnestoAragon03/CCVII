@@ -115,7 +115,7 @@ int main(int argc, char* argv[]){
         //printf("start: %d\n", start);
     }
     //Esperar a que los threads terminen
-    WaitForMultipleObjects(numThreads, threads, TRUE, INFINITE);
+    WaitForMultipleObjects(numThreads, threads, TRUE, 5000);
 
     //Variables para guarar URL mas visitada
     char mostVisitedURL[MAX_URL_LENGTH];
