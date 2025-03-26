@@ -1,0 +1,23 @@
+[2025-03-19 19:43:32] Transferred $34.00 from Account 2 to Account 0
+[2025-03-19 19:43:32] Deposited $48.00 to Account 2 | New Balance: $48.00
+[2025-03-19 19:43:32] Deposited $54.00 to Account 3 | New Balance: $54.00
+[2025-03-19 19:43:32] Transaction Withdrawal Failed: Insufficient funds | Account 0
+[2025-03-19 19:43:32] Transaction Withdrawal Failed: Insufficient funds | Account 3
+[2025-03-19 19:43:32] Withdrew $33.00 from Account 3 | New Balance: $21.00
+[2025-03-19 19:43:32] Deposited $15.00 to Account 1 | New Balance: $15.00
+[2025-03-19 19:43:32] Transferred $61.00 from Account 4 to Account 3
+[2025-03-19 19:43:32] Transferred $31.00 from Account 2 to Account 3
+[2025-03-19 19:43:32] Transferred $22.00 from Account 1 to Account 4
+[2025-03-19 19:43:32] Deposited $40.00 to Account 4 | New Balance: $40.00
+[2025-03-19 19:43:32] Transferred $5.00 from Account 1 to Account 4
+[2025-03-19 19:43:32] Deposited $89.00 to Account 3 | New Balance: $141.00
+[2025-03-19 19:43:32] Transaction Withdrawal Failed: Insufficient funds | Account 0
+[2025-03-19 19:43:32] Transferred $82.00 from Account 0 to Account 1
+
+----------Total Balances----------
+
+Account 1 total Balance: $0.00
+Account 2 total Balance: $10.00
+Account 3 total Balance: $17.00
+Account 4 total Balance: $141.00
+Account 5 total Balance: $45.00
