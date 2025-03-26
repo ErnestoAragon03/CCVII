@@ -8,6 +8,10 @@
 
 HANDLE parkingSpotsSemaphore;
 CRITICAL_SECTION logCriticalSection;
+// Counter for the number of cars that have parked
+int parkedCars = 0;
+// Counter for the average waiting time
+float averageWaitingTime = 0.0;
 
 void logEvent(const char* event, int carId, float waiting_time) {
     EnterCriticalSection(&logCriticalSection);
@@ -44,6 +48,11 @@ DWORD WINAPI carThread(LPVOID param) {
     // Park
     int parkingDuration = (rand() % 5) + 1;
     logEvent("Parked succesfully", carId, waiting_time);
+
+    // Add to average waiting time
+    averageWaitingTime += waiting_time;
+    parkedCars++;
+    // Sleep for parking duration
     Sleep(parkingDuration * 1000);
 
     // Leave
@@ -73,6 +82,13 @@ int main() {
 
     // Wait for all car threads to finish
     WaitForMultipleObjects(NUM_CARS, carThreads, TRUE, INFINITE);
+
+    //Calculate average waiting time
+    averageWaitingTime /= parkedCars;
+    //Print last lines
+    printf("Total cars parked: %d\n", parkedCars);
+    printf("Average waiting time: %.2f seconds\n", averageWaitingTime);
+    
 
     // Clean up
     for (int i = 0; i < NUM_CARS; i++) {
