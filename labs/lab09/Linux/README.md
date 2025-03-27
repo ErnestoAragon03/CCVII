@@ -1,7 +1,7 @@
 # Lab08 - Sistema de Estacionamiento Inteligente
 
 ## Video Demostración
-[Ver video explicativo](| |)
+[Ver video explicativo](|https://youtu.be/KZO1tBYt868 |)
 
 ## Colaboradores
 - [Poncho Ajmv](https://github.com/poncho-ajmv)
