@@ -1,0 +1,4 @@
+para que funcione el visual 
+sudo apt-get install libncurses5-dev
+gcc -Wall -pthread -lncurses -o parking main.c
+./parking
