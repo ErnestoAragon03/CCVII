@@ -4,7 +4,7 @@
 #include <time.h>
 #include <conio.h> // _kbhit() and _getch()
 
-#define MAX_PARKING_SPOTS 5
+#define MAX_PARKING_SPOTS 1
 #define NUM_CARS 10
 
 // Struct to store the data of the car
@@ -37,6 +37,25 @@ float averageWaitingTime = 0.0;
 int running = 1;
 int parkingSpots[MAX_PARKING_SPOTS] = {0};
 CRITICAL_SECTION consoleCriticalSection;
+// Archivo global para los logs
+FILE* logFile;
+CRITICAL_SECTION fileCriticalSection;
+
+// Función para inicializar el archivo de logs
+void initializeLogFile() {
+    logFile = fopen("shared_log.log", "w");
+    if (logFile == NULL) {
+        printf("Error opening log file\n");
+        exit(1);
+    }
+}
+
+// Función para cerrar el archivo de logs
+void closeLogFile() {
+    if (logFile != NULL) {
+        fclose(logFile);
+    }
+}
 
 // Function to clear the console
 void clearConsole() {
@@ -144,12 +163,13 @@ void logEvent(const char* event, int carId, float waiting_time, int priority) {
     GetLocalTime(&time);
     const char* daysOfWeek[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
     if(waiting_time >= 0.0) {
-        printf("[%s %02d %02d %02d:%02d:%02d %04d] %s with ID %d: %s (waited %.2f seconds)\n", 
-            daysOfWeek[time.wDayOfWeek], time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wYear, carType, carId, event, waiting_time);
+        fprintf(logFile, "[%s %02d %02d %02d:%02d:%02d %04d] %s with ID %d: %s (waited %.2f seconds)\n",
+                daysOfWeek[time.wDayOfWeek], time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wYear, carType, carId, event, waiting_time);
     } else {
-        printf("[%s %02d %02d %02d:%02d:%02d %04d] %s with ID %d: %s\n", 
-            daysOfWeek[time.wDayOfWeek], time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wYear, carType, carId, event);
+        fprintf(logFile, "[%s %02d %02d %02d:%02d:%02d %04d] %s with ID %d: %s\n",
+                daysOfWeek[time.wDayOfWeek], time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wYear, carType, carId, event);
     }
+    fflush(logFile); // Asegura que los datos se escriban inmediatamente en el archivo
     LeaveCriticalSection(&consoleCriticalSection);
 }
 
@@ -257,6 +277,9 @@ int main() {
     InitializeCriticalSection(&priorityCriticalSection);
     InitializeCriticalSection(&consoleCriticalSection);
 
+    //Initialize log file
+    initializeLogFile();
+
     // Create car threads
     for (int i = 0; i < NUM_CARS; i++) {
         carDataArray[i] = (CarData*)malloc(sizeof(CarData)); //Allocate memory for car data
@@ -291,8 +314,8 @@ int main() {
         averageWaitingTime /= parkedCars;
     }
     //Print last lines
-    printf("Total cars parked: %d\n", parkedCars);
-    printf("Average waiting time: %.2f seconds\n", averageWaitingTime);
+    fprintf(logFile, "Total cars parked: %d\n", parkedCars);
+    fprintf(logFile, "Average waiting time: %.2f seconds\n", averageWaitingTime);
     
 
     // Clean up
@@ -304,6 +327,9 @@ int main() {
     DeleteCriticalSection(&consoleCriticalSection);
     DeleteCriticalSection(&priorityCriticalSection);
     DeleteCriticalSection(&logCriticalSection);
+
+    //Close log file
+    closeLogFile();
 
     return 0;
 }

@@ -1,0 +1,32 @@
+[Wed 03 26 23:20:26 2025] Ambulance with ID 6: Arrived at parking lot
+[Wed 03 26 23:20:26 2025] Ambulance with ID 6: Parked succesfully (waited 0.00 seconds)
+[Wed 03 26 23:20:26 2025] Police with ID 0: Arrived at parking lot
+[Wed 03 26 23:20:27 2025] Police with ID 3: Arrived at parking lot
+[Wed 03 26 23:20:28 2025] Ambulance with ID 7: Arrived at parking lot
+[Wed 03 26 23:20:28 2025] Firefighter with ID 5: Arrived at parking lot
+[Wed 03 26 23:20:28 2025] Ambulance with ID 4: Arrived at parking lot
+[Wed 03 26 23:20:29 2025] Car with ID 8: Arrived at parking lot
+[Wed 03 26 23:20:30 2025] Ambulance with ID 2: Arrived at parking lot
+[Wed 03 26 23:20:30 2025] Ambulance with ID 9: Arrived at parking lot
+[Wed 03 26 23:20:30 2025] Car with ID 1: Arrived at parking lot
+[Wed 03 26 23:20:31 2025] Ambulance with ID 6: Leaving
+[Wed 03 26 23:20:31 2025] Police with ID 0: Parked succesfully (waited 4.02 seconds)
+[Wed 03 26 23:20:34 2025] Police with ID 0: Leaving
+[Wed 03 26 23:20:34 2025] Car with ID 8: Parked succesfully (waited 4.08 seconds)
+[Wed 03 26 23:20:35 2025] Car with ID 8: Leaving
+[Wed 03 26 23:20:35 2025] Ambulance with ID 2: Parked succesfully (waited 4.11 seconds)
+[Wed 03 26 23:20:38 2025] Ambulance with ID 2: Leaving
+[Wed 03 26 23:20:38 2025] Police with ID 3: Parked succesfully (waited 10.12 seconds)
+[Wed 03 26 23:20:40 2025] Police with ID 3: Leaving
+[Wed 03 26 23:20:40 2025] Ambulance with ID 9: Parked succesfully (waited 9.16 seconds)
+[Wed 03 26 23:20:42 2025] Ambulance with ID 9: Leaving
+[Wed 03 26 23:20:42 2025] Ambulance with ID 4: Parked succesfully (waited 13.19 seconds)
+[Wed 03 26 23:20:45 2025] Ambulance with ID 4: Leaving
+[Wed 03 26 23:20:45 2025] Ambulance with ID 7: Parked succesfully (waited 16.22 seconds)
+[Wed 03 26 23:20:46 2025] Ambulance with ID 7: Leaving
+[Wed 03 26 23:20:46 2025] Firefighter with ID 5: Parked succesfully (waited 17.24 seconds)
+[Wed 03 26 23:20:49 2025] Firefighter with ID 5: Leaving
+[Wed 03 26 23:20:49 2025] Car with ID 1: Parked succesfully (waited 18.27 seconds)
+[Wed 03 26 23:20:52 2025] Car with ID 1: Leaving
+Total cars parked: 10
+Average waiting time: 9.64 seconds
