@@ -1,6 +1,6 @@
 echo "Limpiando archivos anteriores..."
 del *.exe
 echo "Compilando archivos..."
-gcc main.c -o main
+gcc -o main.exe main.c -lpthread
 echo "Corriendo programa"
 call main.exe

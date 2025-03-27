@@ -2,16 +2,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <conio.h> // _kbhit() and _getch()
 
-#define MAX_PARKING_SPOTS 1
+#define MAX_PARKING_SPOTS 5
 #define NUM_CARS 10
 
 // Struct to store the data of the car
 typedef struct {
     int carId;
-    float waiting_time;
     int priority;
+    int parked; //1 if parked, 0 if not
 } CarData;
+
+// Global variables
+
+HANDLE carThreads[NUM_CARS];
+CarData* carDataArray[NUM_CARS];
 
 HANDLE parkingSpotsSemaphore;
 CRITICAL_SECTION logCriticalSection;
@@ -25,7 +31,79 @@ int parkedCars = 0;
 // Counter for the average waiting time
 float averageWaitingTime = 0.0;
 // Array to store the data of the cars
-CarData cars[NUM_CARS];
+//CarData cars[NUM_CARS];
+
+//GUI
+int running = 1;
+int parkingSpots[MAX_PARKING_SPOTS] = {0};
+CRITICAL_SECTION consoleCriticalSection;
+
+// Function to clear the console
+void clearConsole() {
+    system("cls");
+}
+
+// Function to set console text color
+void setColor(int priority) {
+    switch (priority) {
+        case 0: printf("\033[31m"); break; // Red for Ambulance
+        case 1: printf("\033[34m"); break; // Blue for Police
+        case 2: printf("\033[33m"); break; // Yellow for Firefighter
+        case 3: printf("\033[32m"); break; // Green for Regular Car
+        default: printf("\033[0m"); break; // Reset color
+    }
+}
+
+// Function to draw the parking lot and cars
+void drawParkingLot() {
+    EnterCriticalSection(&consoleCriticalSection);
+
+    clearConsole();
+
+    printf("Parking Lot Simulation\n");
+    printf("=======================\n\n");
+
+    // Draw parking spots
+    for (int i = 0; i < MAX_PARKING_SPOTS; i++) {
+        if (parkingSpots[i] == 0) {
+            printf("[ EMPTY ] ");
+        } else {
+            int carId = parkingSpots[i];
+            setColor(carDataArray[carId]->priority);
+            printf("[ID %02d] ", carId);
+            printf("\033[0m"); // Reset color
+        }
+    }
+    printf("\n\n");
+
+    // Draw cars waiting
+    printf("Cars Waiting:\n");
+    for (int i = 0; i < NUM_CARS; i++) {
+        if (!carDataArray[i]->parked) {
+            setColor(carDataArray[i]->priority);
+            char* type;
+            switch(carDataArray[i]->priority){
+                case 0:
+                    type = "Ambulance";
+                    break;
+                case 1:
+                    type = "Police";
+                    break;
+                case 2: 
+                    type= "Firefighter";
+                    break;
+                case 3:
+                    type = "Car";
+                    break;
+            };
+            printf("%s %d (Priority %d)\n",type, carDataArray[i]->carId, carDataArray[i]->priority);
+            printf("\033[0m"); // Reset color
+        }
+    }
+
+    LeaveCriticalSection(&consoleCriticalSection);
+}
+
 
 // Function to dequeue a thread from the priority queue
 HANDLE dequeue(int priority) {
@@ -61,7 +139,7 @@ void logEvent(const char* event, int carId, float waiting_time, int priority) {
         carType = "Car";
         break;
     };
-    EnterCriticalSection(&logCriticalSection);
+    EnterCriticalSection(&consoleCriticalSection);
     SYSTEMTIME time;
     GetLocalTime(&time);
     const char* daysOfWeek[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
@@ -72,7 +150,7 @@ void logEvent(const char* event, int carId, float waiting_time, int priority) {
         printf("[%s %02d %02d %02d:%02d:%02d %04d] %s with ID %d: %s\n", 
             daysOfWeek[time.wDayOfWeek], time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wYear, carType, carId, event);
     }
-    LeaveCriticalSection(&logCriticalSection);
+    LeaveCriticalSection(&consoleCriticalSection);
 }
 
 DWORD WINAPI carThread(LPVOID param) {
@@ -82,6 +160,7 @@ DWORD WINAPI carThread(LPVOID param) {
     int priority = carData->priority;
 
     // Arrive
+    Sleep((rand() % 5 + 1) * 1000); //Random time to arrive
     logEvent("Arrived at parking lot", carId, -1, priority);
 
     //Add car to proper priority queue
@@ -135,18 +214,32 @@ DWORD WINAPI carThread(LPVOID param) {
     float waiting_time = (float)(end - start) / CLOCKS_PER_SEC; // Convert to seconds
     
     // Park
-    int parkingDuration = (rand() % 5) + 1;
-    logEvent("Parked succesfully", carId, waiting_time, priority);
+    EnterCriticalSection(&consoleCriticalSection);
+        for (int i = 0; i < MAX_PARKING_SPOTS; i++) {
+            if (parkingSpots[i] == 0) { // Empty spot found
+                parkingSpots[i] = carId;
+                carData->parked = 1;
+                LeaveCriticalSection(&consoleCriticalSection);
 
-    // Add to average waiting time
-    averageWaitingTime += waiting_time;
-    parkedCars++;
-    // Sleep for parking duration
-    Sleep(parkingDuration * 1000);
+                drawParkingLot();
+                int parkingDuration = (rand() % 5 + 1) * 1000;
+                logEvent("Parked succesfully", carId, waiting_time, priority);
+                // Add to average waiting time
+                averageWaitingTime += waiting_time;
+                parkedCars++;
+                // Sleep for parking duration
+                Sleep(parkingDuration);
 
-    // Leave
-    logEvent("Leaving", carId, -1, priority);
-    ReleaseSemaphore(parkingSpotsSemaphore, 1, NULL);
+                // Leave
+                EnterCriticalSection(&consoleCriticalSection);
+                parkingSpots[i] = 0;
+                LeaveCriticalSection(&consoleCriticalSection);
+                drawParkingLot();
+                logEvent("Leaving", carId, -1, priority);
+                ReleaseSemaphore(parkingSpotsSemaphore, 1, NULL); // Release semaphore
+                return 0;
+            }
+        }
 
     return 0;
 }
@@ -162,9 +255,7 @@ int main() {
     );
     InitializeCriticalSection(&logCriticalSection);
     InitializeCriticalSection(&priorityCriticalSection);
-
-    HANDLE carThreads[NUM_CARS];
-    CarData* carDataArray[NUM_CARS];
+    InitializeCriticalSection(&consoleCriticalSection);
 
     // Create car threads
     for (int i = 0; i < NUM_CARS; i++) {
@@ -174,6 +265,7 @@ int main() {
             return 1;
         }
         carDataArray[i]->carId = i;
+        carDataArray[i]->parked = 0;
         float randomValue = (float)rand() / RAND_MAX; // Generate a random float between 0 and 1
         if (randomValue < 0.4) {
             carDataArray[i]->priority = 0; // 40% probability
@@ -209,8 +301,9 @@ int main() {
         free(carDataArray[i]);      //Free memory allocated for car data
     }
     CloseHandle(parkingSpotsSemaphore);
-    DeleteCriticalSection(&logCriticalSection);
+    DeleteCriticalSection(&consoleCriticalSection);
     DeleteCriticalSection(&priorityCriticalSection);
+    DeleteCriticalSection(&logCriticalSection);
 
     return 0;
 }
