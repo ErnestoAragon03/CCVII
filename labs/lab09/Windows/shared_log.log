@@ -1,0 +1,32 @@
+[Fri 03 28 08:27:03 2025] Ambulance with ID 6: Arrived at parking lot
+[Fri 03 28 08:27:03 2025] Ambulance with ID 1: Arrived at parking lot
+[Fri 03 28 08:27:03 2025] Ambulance with ID 6: Parked succesfully (waited 0.00 seconds)
+[Fri 03 28 08:27:04 2025] Ambulance with ID 4: Arrived at parking lot
+[Fri 03 28 08:27:04 2025] Car with ID 9: Arrived at parking lot
+[Fri 03 28 08:27:04 2025] Ambulance with ID 6: Leaving
+[Fri 03 28 08:27:04 2025] Ambulance with ID 1: Parked succesfully (waited 1.10 seconds)
+[Fri 03 28 08:27:05 2025] Car with ID 7: Arrived at parking lot
+[Fri 03 28 08:27:05 2025] Car with ID 2: Arrived at parking lot
+[Fri 03 28 08:27:05 2025] Ambulance with ID 8: Arrived at parking lot
+[Fri 03 28 08:27:06 2025] Police with ID 5: Arrived at parking lot
+[Fri 03 28 08:27:06 2025] Ambulance with ID 1: Leaving
+[Fri 03 28 08:27:07 2025] Car with ID 7: Parked succesfully (waited 1.17 seconds)
+[Fri 03 28 08:27:07 2025] Ambulance with ID 3: Arrived at parking lot
+[Fri 03 28 08:27:07 2025] Ambulance with ID 0: Arrived at parking lot
+[Fri 03 28 08:27:08 2025] Car with ID 7: Leaving
+[Fri 03 28 08:27:08 2025] Police with ID 5: Parked succesfully (waited 1.24 seconds)
+[Fri 03 28 08:27:12 2025] Police with ID 5: Leaving
+[Fri 03 28 08:27:12 2025] Car with ID 2: Parked succesfully (waited 6.30 seconds)
+[Fri 03 28 08:27:16 2025] Car with ID 2: Leaving
+[Fri 03 28 08:27:16 2025] Ambulance with ID 8: Parked succesfully (waited 10.37 seconds)
+[Fri 03 28 08:27:17 2025] Ambulance with ID 8: Leaving
+[Fri 03 28 08:27:17 2025] Ambulance with ID 4: Parked succesfully (waited 12.43 seconds)
+[Fri 03 28 08:27:21 2025] Ambulance with ID 4: Leaving
+[Fri 03 28 08:27:21 2025] Car with ID 9: Parked succesfully (waited 16.48 seconds)
+[Fri 03 28 08:27:26 2025] Car with ID 9: Leaving
+[Fri 03 28 08:27:26 2025] Ambulance with ID 0: Parked succesfully (waited 18.52 seconds)
+[Fri 03 28 08:27:28 2025] Ambulance with ID 0: Leaving
+[Fri 03 28 08:27:28 2025] Ambulance with ID 3: Parked succesfully (waited 20.57 seconds)
+[Fri 03 28 08:27:31 2025] Ambulance with ID 3: Leaving
+Total cars parked: 10
+Average waiting time: 8.82 seconds
