@@ -1,3 +1,4 @@
+// main.h
 #ifndef ZOMBIE_BRIDGE_H
 #define ZOMBIE_BRIDGE_H
 
@@ -15,7 +16,7 @@
 #define MAX_STUDENTS 10
 #define ANIMATION_DELAY 150000
 #define MAX_NAME_LENGTH 20
-#define MAX_WAIT_ALLOWED 10000 // Si se cambia eso puede pasar mas rapido a convertidos
+#define MAX_WAIT_ALLOWED 10000 // milisegundos (10s)
 
 // Colores y elementos visuales
 #define COLOR_RED     "\033[31m"
@@ -50,7 +51,7 @@ typedef struct {
     long end_cross_time;
 } Student;
 
-// Variables globales (extern)
+// Variables globales
 extern pthread_mutex_t bridge_mutex;
 extern pthread_cond_t bridge_cond;
 extern int current_direction;
@@ -72,13 +73,14 @@ void draw_safe_exit();
 void draw_bridge();
 void draw_zombies();
 void draw_scene();
+void draw_intro_screen();
+void show_summary();
 void log_activity(const char* message);
+void animate_crossing(Student* s);
 void check_starvation();
+int check_starvation_condition(Student* s);
 void access_bridge(Student* s);
 void exit_bridge(Student* s);
-int check_starvation_condition(Student* s);
 void* student_thread(void* arg);
-void show_summary();
-void draw_intro_screen();
 
 #endif // ZOMBIE_BRIDGE_H
