@@ -8,7 +8,7 @@ void accessBridge(Bridge* bridge, Direction direction){
     clock_t start = clock(); // Iniciar el temporizador
     //Esperar hasta que el estudiante pueda cruzar (si hay más de 3 cruzando o se va en dirección opuesta)
     while (bridge->crossingCount > 3 || bridge->currentDirection != direction) {
-        SleepConditionVariableCS(&bridge->canCross, &bridge->lock, INFINITE);
+        SleepConditionVariableCS(&bridge->canCross, &bridge->lock, 800);
     }
 
     clock_t end = clock(); // Finalizar el temporizador
