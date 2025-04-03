@@ -1,23 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "student.h"
+#include "bridge.h"
 #include <time.h>
 
 // Función que simula la acción de "cruce"
 DWORD WINAPI cruzar(void* arg) {
     Estudiante* estudiante = (Estudiante*)arg;
 
-    // Generar un tiempo aleatorio entre 0 y 5 segundos
-    int tiempo_espera = rand() % 6;
-    printf("Estudiante %d esperando %d segundos antes de cruzar.\n", estudiante->id, tiempo_espera);
-    sleep(tiempo_espera);
+    //Intentar cruzar el puente
+    printf("Inge %d arrives wanting to go %s\n", estudiante->id, estudiante->direction == RIGHT ? "Right" : "Left");
+    accessBridge(estudiante->bridge, estudiante->direction);
 
-    // Acción de cruce
-    printf("Estudiante %d está cruzando.\n", estudiante->id);
+    //Simular el tiempo de cruce
+    printf("Inge %d crosses to the %s (on bridge: %d).\n", estudiante->id, estudiante->direction == RIGHT ? "Right" : "Left", estudiante->bridge->crossingCount);   
+    // Generar un tiempo aleatorio entre 0 y 3 segundos
+    Sleep((rand() % 3 + 1) * 1000);
 
-    return NULL;
+    // Salir del puente
+    printf("Inge %d exits bridge. (on bridge: %d)\n", estudiante->id, estudiante->bridge->crossingCount);
+    exitBridge(estudiante->bridge);
+
+    free(estudiante); // Liberar la memoria del estudiante después de cruzar
+    return 0;
 }
 
+/*
 // Función para crear un estudiante (thread)
 Estudiante* crear_estudiante(int id) {
     Estudiante* estudiante = (Estudiante*)malloc(sizeof(Estudiante));
@@ -48,3 +56,4 @@ void destruir_estudiante(Estudiante* estudiante) {
     // Liberar la memoria asignada
     free(estudiante);
 }
+*/

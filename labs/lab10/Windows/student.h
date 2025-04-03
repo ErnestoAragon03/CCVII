@@ -5,16 +5,16 @@
 #include <stdlib.h>
 #include <time.h>
 #include <windows.h> // Para Windows, si se usa Linux, cambiar a <unistd.h> y eliminar <windows.h>
+#include "bridge.h" // Incluir el archivo de cabecera del puente
 
 // Estructura para representar un estudiante
 typedef struct {
     int id;                 // Identificador único del estudiante
-    HANDLE thread;       // Hilo asociado al estudiante
+    Direction direction; // Dirección en la que el estudiante va a cruzar
+    Bridge* bridge; // Puntero al puente
 } Estudiante;
 
 DWORD WINAPI cruzar(LPVOID arg); // Función que simula la acción de "cruce"
-Estudiante* crear_estudiante(int id); // Función para crear un estudiante (thread)
-void destruir_estudiante(Estudiante* estudiante); // Función para destruir un estudiante (esperar a que termine su hilo)
 
 
 #endif
