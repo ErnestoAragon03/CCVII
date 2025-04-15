@@ -1,7 +1,8 @@
 # Lab011 - Simulación de Algoritmos de Planificación de CPU
 
 ## Video de YouTube
-[Ver video](||)
+[Ver video parte 1](|https://youtu.be/xyiRSXJ8L-E|)
+[Ver video parte 2](|https://youtu.be/58Ud-af90EU|)
 ---
 
 ---
