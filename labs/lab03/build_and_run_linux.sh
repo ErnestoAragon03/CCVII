@@ -36,4 +36,4 @@ arm-none-eabi-objcopy -O binary calculadora.elf calculadora.bin
 
 # Run the binary in QEMU
 echo "Running QEMU..."
-qemu-system-arm -M versatilepb -nographic -kernel calculadora.elf -audiodev none,id=noaudio
+qemu-system-arm -M versatilepb -nographic -kernel calculadora.elf 
