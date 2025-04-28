@@ -1,1 +1,1 @@
-rm -f *.o hello.elf hello.bin hello.list
+rm -f *.o *.elf *.bin *.list
