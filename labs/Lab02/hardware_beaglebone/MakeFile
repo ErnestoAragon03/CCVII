@@ -1,0 +1,34 @@
+CC = arm-none-eabi-gcc
+AS = arm-none-eabi-as
+LD = arm-none-eabi-ld
+OBJCOPY = arm-none-eabi-objcopy
+CFLAGS = -mcpu=cortex-a8 -marm -nostdlib -nostartfiles -Wall -O0
+LDFLAGS = -T linker.ld
+OBJECTS = root.o main.o stdio.o os.o utils.o
+
+all: calculadora.bin
+
+root.o: root.s
+	$(AS) -mcpu=cortex-a8 -o $@ $<
+
+main.o: main.c
+	$(CC) $(CFLAGS) -c $<
+
+stdio.o: stdio.c
+	$(CC) $(CFLAGS) -c $<
+
+os.o: os.c
+	$(CC) $(CFLAGS) -c $<
+
+utils.o: utils.c
+	$(CC) $(CFLAGS) -c $<
+
+calculadora.elf: $(OBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJECTS)
+
+calculadora.bin: calculadora.elf
+	$(OBJCOPY) -O binary $< $@
+
+clean:
+	rm -f *.o *.elf *.bin
+
