@@ -21,7 +21,7 @@
 //UART
 extern void PUT32(unsigned int, unsigned int);
 extern unsigned int GET32(unsigned int);
-
+extern void os_main(void);
 #define UART0_BASE 0x44E09000
 #define UART_THR   (UART0_BASE + 0x00)
 #define UART_LSR   (UART0_BASE + 0x14)
@@ -36,22 +36,20 @@ void PRINT(const char *s) {
     while (*s) uart_send(*s++);
 }
 
-void timer_setup(unsigned int load_value) {
-    // Configurar el timer
-    DMTIMER_TCLR |= (1 << 1); //habiliar Auto-reload
-    DMTIMER_TLDR = load_value; //cargar el valor de carga
-    DMTIMER_IRQENABLE_SET |= (1<<1);//hablitar interrupcion en overflow de timer
-    DMTIMER_TCRR = load_value;         // Valor inicial
+void timer_setup() {
+    DMTIMER_TCLR = 0;  // Asegúrate de parar el timer antes de configurar
 
-    //arranca timer
-    DMTIMER_TCLR |= (1 << 0);          // Enable = 1
+    DMTIMER_TLDR = 0xFFFF0000;         // Valor que da 2 segundos (según manual)
+    DMTIMER_TCRR = 0xFFFF0000;         // Valor inicial
+    DMTIMER_IRQENABLE_SET = (1 << 1);  // Habilita interrupción por overflow
 
+    // Sin prescaler, solo habilita start y autoreload
+    DMTIMER_TCLR = (1 << 0) | (1 << 1);
 }
 
 
-void isr_timer2(){
 
-    INTC_MIR_CLEAR2 |= (1 << (68 - 64));
+void isr_timer2(){
     //rutina de servicio de interrupcion
 
     PRINT("******************Timer2 Interrupt******************\n");
@@ -60,4 +58,28 @@ void isr_timer2(){
     // Señala fin de atención al INTC (EOI)
     DTIMER_IRQ_EOI = 1;
 
+}
+void os_main(void) {
+    PRINT("Iniciando OS...\n");
+
+    // Desmascarar interrupción del Timer2 (IRQ 68)
+    INTC_MIR_CLEAR2 = (1 << (68 - 64));
+
+    PRINT("Interrupcion Timer2 habilitada en INTC\n");
+
+    // Configurar el Timer
+    timer_setup();
+
+    PRINT("Timer configurado\n");
+
+    // Habilitar interrupciones globales
+    asm volatile("cpsie i");
+    PRINT("IRQ global habilitado\n");
+    
+    
+        // Bucle infinito
+        int i = 0;
+        while (i<100) {
+            i++;
+        }
 }

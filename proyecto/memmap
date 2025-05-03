@@ -6,6 +6,11 @@ MEMORY
 SECTIONS
 {
     . = ORIGIN(ram);
+    
+    .vectors : {
+        KEEP(*(.vectors))
+    } > ram
+    
     .text :
     {
         *(.text*)
