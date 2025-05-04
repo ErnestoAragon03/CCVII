@@ -4,11 +4,24 @@
 
 .global _start
 
-_start:
-    ldr sp, =_stack_top        @ Inicializa la pila
 
-    bl os_main                 @ Inicializa el sistema (UART, Timer, etc.)
-    bl app_main                @ Ejecuta la aplicación principal
+_start:
+    ldr sp, =_stack_top
+
+    ldr r0, =_vectors          @ Dirección en RAM donde están los vectores
+    ldr r1, =0x82000000        @ Dirección en RAM donde queremos ubicarlos (en la región válida)
+    mov r2, #64                @ Tamaño de la tabla de vectores (8 entradas x 4 bytes = 32 bytes, usa 64 para margen)
+copy_vectors:
+    ldr r3, [r0], #4
+    str r3, [r1], #4
+    subs r2, r2, #4
+    bne copy_vectors
+
+    ldr r0, =0x82000000        @ Apuntar el VBAR a la dirección de la tabla de vectores en RAM
+    mcr p15, 0, r0, c12, c0, 0
+
+    bl os_main
+    bl app_main
 
     b hang
 
@@ -52,8 +65,39 @@ _vectors:
 .extern isr_timer2           @ Permitimos llamar a la función en C
 
 irq_handler:
-    bl isr_timer2            @ Llama al manejador de IRQ del Timer2
-    subs pc, lr, #4          @ Vuelve de la interrupción (modo ARM)
+    sub lr, lr, #4            @ Ajusta LR para el retorno correcto
+    stmfd sp!, {r0-r12, lr}   @ Guarda todos los registros que podrían ser usados
+    mrs r11, spsr             @ Guarda el SPSR (Status Register)
+
+     @ Leer la IRQ activa
+    ldr r10, =0x48200040       
+    ldr r10, [r10]            @ Lee el valor de INTC_SIR_IRQ
+    and r10, r10, #0x7F    @ Aplica la máscara para obtener el número de IRQ
+
+    cmp r10, #68                @ Compara r10 (IRQ activa) con 68
+    bne irq_unknown             @ Si no es 68, salta a un manejador de interrupciones desconocidas
+
+    @ Salto a la rutina de interrupción correspondiente
+    ldr pc, [pc, r10, lsl #2] @ Usa el valor de r10 como índice para la tabla
+
+    @ Tabla de rutinas de interrupción
+    .word irq68_handler         @ Manejo para IRQ68
+
+irq_unknown:
+    @ Manejo de interrupción desconocida (puedes hacer algo aqui, como un error o una rutina genérica)
+    b irq_end
+
+irq68_handler:
+    @ Lógica para manejar la interrupción IRQ 68 (Timer)
+    stmfd sp!, {r0-r12}       @ Guarda los registros antes de llamar a la función C
+    bl isr_timer2             @ Llama a la rutina en C que manejará la interrupción del Timer
+    ldmfd sp!, {r0-r12}       @ Restaura los registros
+    b irq_end 
+
+irq_end:
+    ldmfd sp!, {r0-r12, lr}       @ Restaura el contexto
+    subs pc, lr, #0               @ Retorna de la interrupción
+
 
 undef_handler:    b undef_handler
 swi_handler:      b swi_handler
