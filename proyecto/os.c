@@ -63,21 +63,14 @@ void timer_setup() {
 void isr_timer2(){
     //rutina de servicio de interrupcion
     PRINT("******************Timer2 Interrupt******************\n");
-      // Agregar un pequeño retardo
 
-    // Limpia la interrupción de overflow
+    // Limpia la interrupción de overflow del Timer2
     DMTIMER_IRQSTATUS = (1 << 1);     // OVF_IT = bit 1
 
-    *(volatile unsigned int*)0x48200048 = 0x1;  // NEWIRQAGR, fin de atencion IRQ
-
-    //asegurarse que se commpleto la escritura
+    // Sin notificación al INTC aquí (lo hace ASM)
     __asm__ __volatile__("dsb");
-    // Señala fin de atención al INTC (EOI)
-    DTIMER_IRQ_EOI = 1;
-
-    INTC_CONTROL = 0x1;
-
 }
+
 void os_main(void) {
     PRINT("Iniciando OS...\n");
 

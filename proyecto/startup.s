@@ -17,7 +17,13 @@ copy_vectors:
     subs r2, r2, #4
     bne copy_vectors
 
-    ldr r0, =0x82000000        @ Apuntar el VBAR a la dirección de la tabla de vectores en RAM
+    @ Desactivar vectores altos
+    mrc p15, 0, r0, c1, c0, 0
+    bic r0, r0, #(1 << 13)
+    mcr p15, 0, r0, c1, c0, 0
+
+    @ Establecer VBAR a la tabla de vectores copiada en RAM
+    ldr r0, =0x82000000
     mcr p15, 0, r0, c12, c0, 0
 
     bl os_main
@@ -79,6 +85,8 @@ irq_handler:
 
     @ Salto a la rutina de interrupción correspondiente
     ldr pc, [pc, r10, lsl #2] @ Usa el valor de r10 como índice para la tabla
+    
+    nop
 
     @ Tabla de rutinas de interrupción
     .word irq68_handler         @ Manejo para IRQ68
@@ -88,15 +96,24 @@ irq_unknown:
     b irq_end
 
 irq68_handler:
-    @ Lógica para manejar la interrupción IRQ 68 (Timer)
-    stmfd sp!, {r0-r12}       @ Guarda los registros antes de llamar a la función C
-    bl isr_timer2             @ Llama a la rutina en C que manejará la interrupción del Timer
-    ldmfd sp!, {r0-r12}       @ Restaura los registros
-    b irq_end 
+    bl isr_timer2             @ rutina de servicio y Limpia interrupción C
+    b irq_end
 
 irq_end:
-    ldmfd sp!, {r0-r12, lr}       @ Restaura el contexto
-    subs pc, lr, #0               @ Retorna de la interrupción
+
+    @ Permitir nuevas interrupciones: NEWIRQAGR en INTC_CONTROL
+    ldr r0, =0x48200048
+    mov r1, #1
+    str r1, [r0]
+
+    @ Data Synchronization Barrier (espera que todo se complete)
+    mov r0, #0
+    mcr p15, 0, r0, c7, c10, 4
+
+    @ Restaurar SPSR y contexto
+    msr spsr_cxsf, r11
+    ldmfd sp!, {r0-r12, lr}
+    subs pc, lr, #0
 
 
 undef_handler:    b undef_handler
