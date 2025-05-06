@@ -14,6 +14,8 @@
         "span": "c",
         "text_encoding": "c",
         "pthread.h": "c",
-        "random": "c"
+        "random": "c",
+        "windows.h": "c",
+        "bridge.h": "c"
     }
 }
