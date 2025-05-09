@@ -10,7 +10,7 @@ extern unsigned int GET32(unsigned int);
 
 void uart_hex(unsigned int val);
 
-int app_main(void) {
+void app_main(void) {
     PRINT("Iniciando app_main (modo debug)...\n");
 
     while (1) {
@@ -30,5 +30,4 @@ int app_main(void) {
 
     }
 
-    return 0;
 }

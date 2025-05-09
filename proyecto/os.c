@@ -1,28 +1,28 @@
 
-//TIMER2
-#define DMTIMER2_BASE 0x48040000
-#define DMTIMER_TIDR           (*(volatile unsigned int *)(DMTIMER2_BASE + 0x0))
-#define DTIMER_IRQ_EOI         (*(volatile unsigned int *)(DMTIMER2_BASE + 0x20))// Timer IRQ End-of-Interrupt Register
-#define DMTIMER_IRQSTATUS_RAW  (*(volatile unsigned int *)(DMTIMER2_BASE + 0x24))
-#define DMTIMER_IRQSTATUS      (*(volatile unsigned int *)(DMTIMER2_BASE + 0x28))
-#define DMTIMER_IRQENABLE_SET  (*(volatile unsigned int *)(DMTIMER2_BASE + 0x2C))//Timer Interrupt Enable Set Register
-#define DMTIMER_IRQENABLE_CLR  (*(volatile unsigned int *)(DMTIMER2_BASE + 0x30))// Timer Interrupt Enable Clear Register
-#define DMTIMER_TCLR           (*(volatile unsigned int *)(DMTIMER2_BASE + 0x38))//activa o desactiva en cualquier momento al timer
-#define DMTIMER_TCRR           (*(volatile unsigned int *)(DMTIMER2_BASE + 0x3C))//contiene el valor del timer
-#define DMTIMER_TLDR           (*(volatile unsigned int *)(DMTIMER2_BASE + 0x40))//contiene el valor de carga del timer en modo Auto reload
-
-//INTERRUPCIONES TIMER 2
-#define INTC_BASE 0x48200000
-#define INTC_SIR_IRQ           (*(volatile unsigned int *)(INTC_BASE + 0x40))//contiene el numero de la interrupcion que ha sido activada
-#define INTC_CONTROL           (*(volatile unsigned int *)(INTC_BASE + 0x48))//1h(Write) = NewIrq_Reset IRQ output and enable new IRQ generation
-#define INTC_ILR68             (*(volatile unsigned int *)(INTC_BASE + 0x100 + (68 * 4)))// prioridad del Timer2 (IRQ 68)
-#define INTC_SIR_IRQ           (*(volatile unsigned int *)(INTC_BASE + 0x40))//contiene el numero de la interrupcion que ha sido activada
-#define INTC_MIR_CLEAR2         (*(volatile unsigned int *)(INTC_BASE + 0xC8)) //MIR_CLEAR2 para liberar la interrupcion 68 (Timer2)
-
-//UART
+extern void enable_irq(void);
 extern void PUT32(unsigned int, unsigned int);
 extern unsigned int GET32(unsigned int);
 extern void os_main(void);
+extern void app_main(void);
+#define UART0_BASE     0x44E09000
+#define UART_THR       (UART0_BASE + 0x00)
+#define UART_LSR       (UART0_BASE + 0x14)
+#define UART_LSR_THRE  0x20
+
+#define DMTIMER2_BASE    0x48040000
+#define TCLR             (DMTIMER2_BASE + 0x38)
+#define TCRR             (DMTIMER2_BASE + 0x3C)
+#define TISR             (DMTIMER2_BASE + 0x28)
+#define TIER             (DMTIMER2_BASE + 0x2C)
+#define TLDR             (DMTIMER2_BASE + 0x40)
+
+#define INTCPS_BASE      0x48200000
+#define INTC_MIR_CLEAR2  (INTCPS_BASE + 0xC8)
+#define INTC_CONTROL     (INTCPS_BASE + 0x48)
+
+#define CM_PER_BASE      0x44E00000
+#define CM_PER_TIMER2_CLKCTRL (CM_PER_BASE + 0x80)
+
 #define UART0_BASE 0x44E09000
 #define UART_THR   (UART0_BASE + 0x00)
 #define UART_LSR   (UART0_BASE + 0x14)
@@ -44,48 +44,56 @@ void PRINT(const char *s) {
     while (*s) uart_send(*s++);
 }
 
-void timer_setup() {
-    PRINT("Configurando Timer2...\n");
-    DMTIMER_TCLR = 0;  // Asegúrate de parar el timer antes de configurar
+void timer_init(void) {
+    PRINT("Step 1: Enable timer clock\n");
+    PUT32(CM_PER_TIMER2_CLKCTRL, 0x2);
 
-    // Valor que produce una interrupción cada 10 segundos
-    DMTIMER_TLDR = 0xF1F9A100;
-    DMTIMER_TCRR = 0xF1F9A100;         // Valor inicial
-    DMTIMER_IRQENABLE_SET = (1 << 1);  // Habilita interrupción por overflow
+    PRINT("Step 2: Unmask IRQ 68\n");
+    PUT32(INTC_MIR_CLEAR2, 1 << (68 - 64));
+    PUT32(INTCPS_BASE + 0x110, 0x0);  // INTC_ILR68: Priority 0, IRQ not FIQ
 
-    // Sin prescaler, solo habilita start y autoreload
-    DMTIMER_TCLR = (1 << 0) | (1 << 1);
-    PRINT("Timer2 configurado\n");
+    PRINT("Step 3: Stop timer\n");
+    PUT32(TCLR, 0);
+
+    PRINT("Step 4: Clear interrupts\n");
+    PUT32(TISR, 0x7);
+
+    PRINT("Step 5: Set load value\n");
+    PUT32(TLDR, 0xFE91CA00);
+
+    PRINT("Step 6: Set counter\n");
+    PUT32(TCRR, 0xFE91CA00);
+
+    PRINT("Step 7: Enable overflow interrupt\n");
+    PUT32(TIER, 0x2);
+
+    PRINT("Step 8: Start timer with auto-reload\n");
+    PUT32(TCLR, 0x3);
+
+    PRINT("Timer initialized\n");
 }
 
-
-
-void isr_timer2(){
-    //rutina de servicio de interrupcion
-    PRINT("******************Timer2 Interrupt******************\n");
-
-    // Limpia la interrupción de overflow del Timer2
-    DMTIMER_IRQSTATUS = (1 << 1);     // OVF_IT = bit 1
-
-    // Sin notificación al INTC aquí (lo hace ASM)
-    __asm__ __volatile__("dsb");
+void timer_irq_handler(void) {
+    PUT32(TISR, 0x2);
+    
+    PUT32(INTC_CONTROL, 0x1);
+    PRINT("*****************************************************Tick*************************************************************\n");
+    int i=0;
+    while(i<1000) {
+        i++;
+    }
 }
 
 void os_main(void) {
     PRINT("Iniciando OS...\n");
 
-    INTC_ILR68 = 0x0;  // Nivel de prioridad más alto (0x0), tipo IRQ
-    // Desmascarar interrupción del Timer2 (IRQ 68)
-    INTC_MIR_CLEAR2 = (1 << (68 - 64));
+    PRINT("Starting...\n");
+    timer_init();
+    enable_irq();
 
-    PRINT("Interrupcion Timer2 habilitada en INTC\n");
-
-    
-
-    // Habilitar interrupciones globales
-    asm volatile("cpsie i");
-    // Configurar el Timer
-    timer_setup();
+    PRINT("Initial TCRR: ");
+    uart_hex(GET32(TCRR));
     PRINT("IRQ global habilitado\n");
 
+    app_main(); // Llama a la función principal de la aplicación
 }
