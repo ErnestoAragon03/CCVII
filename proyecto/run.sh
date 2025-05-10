@@ -1,26 +1,31 @@
 #!/bin/bash
 
-echo "🧹 Limpiando archivos anteriores..."
-rm -f *.o hello.elf hello.bin hello.list
+echo "🧹 Limpiando..."
+rm -f *.o *.elf *.bin *.list
 
 echo "⚙️  Ensamblando startup.s..."
-arm-none-eabi-as startup.s -o startup.o || { echo "❌ Error en ensamblado"; exit 1; }
+arm-none-eabi-as startup.s -o startup.o
 
-echo "🧠 Compilando hello.c..."
-arm-none-eabi-gcc -c -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=hard \
-  -Wall -Werror -O2 -nostdlib -nostartfiles -ffreestanding hello.c -o hello.o \
-  || { echo "❌ Error en compilación"; exit 1; }
+echo "🧠 Compilando Dependencias del OS..."
+arm-none-eabi-gcc -c -mcpu=cortex-a8 -nostdlib -nostartfiles -ffreestanding -Wall uart.c -o uart.o
 
-echo "🔗 Enlazando con memmap..."
-arm-none-eabi-ld -T memmap startup.o hello.o -o hello.elf \
-  || { echo "❌ Error en enlace"; exit 1; }
+echo "🧠 Compilando OS..."
+arm-none-eabi-gcc -c -mcpu=cortex-a8 -nostdlib -nostartfiles -ffreestanding -Wall os.c -o os.o
 
-echo "📦 Generando hello.bin..."
-arm-none-eabi-objcopy hello.elf -O binary hello.bin \
-  || { echo "❌ Error al generar binario"; exit 1; }
+echo "👤 Compilando Programa 1..."
+arm-none-eabi-gcc -c -mcpu=cortex-a8 -nostdlib -nostartfiles -ffreestanding -Wall p1.c -o p1.o
 
-echo "🔍 Desensamblando a hello.list (opcional)..."
-arm-none-eabi-objdump -D hello.elf > hello.list
+echo "👤 Compilando Programa 2..."
+arm-none-eabi-gcc -c -mcpu=cortex-a8 -nostdlib -nostartfiles -ffreestanding -Wall p2.c -o p2.o
 
-echo "✅ Compilación completa. Archivos generados:"
-ls -lh hello.elf hello.bin hello.list
+echo "🔗 Enlazando todo con memmap..."
+arm-none-eabi-ld -T memmap startup.o os.o uart.o p1.o p2.o -o system.elf
+
+echo "📦 Generando binario..."
+arm-none-eabi-objcopy system.elf -O binary system.bin
+
+echo "📜 Desensamblando..."
+arm-none-eabi-objdump -D system.elf > system.list
+
+echo "✅ ¡Compilación completada!"
+ls -lh system.elf system.bin system.list
