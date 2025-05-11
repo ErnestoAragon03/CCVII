@@ -16,6 +16,9 @@
 #define CM_PER_BASE      0x44E00000
 #define CM_PER_TIMER2_CLKCTRL (CM_PER_BASE + 0x80)
 
+void timer_init(void);
+void timer_irq_handler(void);
+
 
 
 #endif

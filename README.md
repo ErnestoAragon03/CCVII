@@ -54,3 +54,27 @@ Este proyecto implementa un sistema operativo bare-metal con multiprogramación 
 - Pruebas unitarias para UART y Timer antes de integrar el planificador.
 - Pruebas de estabilidad en ejecución continua de los procesos.
 
+
+## Implementación
+
+### timer.c
+Este archivo está destinado a las funciones relacionadas con el timer del BeagleBoard.  Contiene las siguientes funciones:
+
+- void timer_init(void):
+- void timer_irq_handler(void):
+
+
+### uart.c
+Este archivo está destinado a la comunicación UART con la BeagleBoard.  Tiene las siguientes funciones:
+
+- void uart_send(unsigned char): Función encargada de
+- void uart_hex(unsigned int):
+- void PRINT(const char*):
+
+### scheduler.c
+Este archivo se encarga de todas las funciones necesarias para el scheduler de procesos del os.  Cuenta con las siguientes funciones:
+
+- 
+
+### pcb.c 
+Archivo encargado de crear los PCB al momento de iniciar un nuevo proceso.

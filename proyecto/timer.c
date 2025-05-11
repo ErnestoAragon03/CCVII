@@ -1,4 +1,6 @@
 #include "timer.h"
+#include "scheduler.h"
+#include "uart.h"
 
 extern void PUT32(unsigned int, unsigned int);
 extern unsigned int GET32(unsigned int);
@@ -41,4 +43,6 @@ void timer_irq_handler(void) {
     while(i<1000) {
         i++;
     }
+
+    select_next_process();
 }

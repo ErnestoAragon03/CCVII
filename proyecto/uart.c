@@ -7,6 +7,29 @@ void uart_send(unsigned char x) {
     while ((GET32(UART_LSR) & UART_LSR_THRE) == 0);
     PUT32(UART_THR, x);
 }
+
+void uart_decimal(unsigned int value) {
+    char buffer[10]; // Máximo para un uint32_t: 4294967295 (10 dígitos)
+    int i = 0;
+
+    // Caso especial para 0
+    if (value == 0) {
+        uart_send('0');
+        return;
+    }
+
+    // Convertir a decimal (en orden inverso)
+    while (value > 0) {
+        buffer[i++] = '0' + (value % 10);
+        value /= 10;
+    }
+
+    // Enviar en orden correcto
+    while (i-- > 0) {
+        uart_send(buffer[i]);
+    }
+}
+
 void uart_hex(unsigned int value) {
     for (int i = 7; i >= 0; i--) {
         unsigned int nibble = (value >> (i * 4)) & 0xF;

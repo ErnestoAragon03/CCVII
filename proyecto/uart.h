@@ -7,6 +7,7 @@
 #define UART_LSR_THRE  0x20
 
 void uart_send(unsigned char x);
+void uart_decimal(unsigned int value);
 void uart_hex(unsigned int value);
 void PRINT(const char *s);
 
