@@ -1,5 +1,4 @@
 #include "pcb.h"
-#include "uart.h"
 
 #define MAX_PROCESSES 10
 PCB process_table[MAX_PROCESSES];

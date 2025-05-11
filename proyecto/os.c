@@ -18,15 +18,29 @@ void os_main(void) {
     PRINT("Initial TCRR: ");
     uart_hex(GET32(TCRR));
     PRINT("IRQ global habilitado\n");
-    
-    PRINT("Tabla de procesos creada\n");
+
+    PRINT("Creando tabla de procesos...\n");
+    create_table(); // Crear tabla de procesos
+
+
     PRINT("Creando procesos...\n");
-    int pid = create_process(main_p1); // Crear proceso 1
+
+    int pid1 = create_process(main_p1); // Crear proceso 1
     PRINT("Proceso 1 creado con PID: ");
-    uart_decimal(pid);
+    uart_decimal(pid1);
     PRINT("\n");
-    if (pid < 0) {
+    if (pid1 < 0) {
         PRINT("Error al crear proceso 1\n");
     }
-    start_process(pid); // Iniciar proceso 1
+
+    int pid2 = create_process(main_p2); // Crear proceso 2
+    PRINT("Proceso 2 creado con PID: ");
+    uart_decimal(pid2);
+    PRINT("\n");
+    if (pid2 < 0) {
+        PRINT("Error al crear proceso 2\n");
+    }
+
+    start_process(pid1); // Iniciar proceso 1
+    start_process(pid2); // Iniciar proceso 2
 }

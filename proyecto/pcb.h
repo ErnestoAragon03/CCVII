@@ -19,6 +19,7 @@ typedef struct{
 extern int num_processes;
 extern PCB process_table[];
 
+void create_table(void);
 int create_process(void (*function)(void));
 void start_process(unsigned int pid);
 
