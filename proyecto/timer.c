@@ -39,10 +39,6 @@ void timer_irq_handler(void) {
     
     PUT32(INTC_CONTROL, 0x1);
     PRINT("\n*****************************************************Tick*************************************************************\n");
-    int i=0;
-    while(i<1000) {
-        i++;
-    }
 
     select_next_process();
 }

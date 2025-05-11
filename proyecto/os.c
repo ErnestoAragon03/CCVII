@@ -6,6 +6,7 @@ extern unsigned int GET32(unsigned int);
 #include "uart.h"
 #include "timer.h"
 #include "pcb.h"
+#include "scheduler.h"
 
 
 void os_main(void) {
@@ -18,6 +19,9 @@ void os_main(void) {
     PRINT("Initial TCRR: ");
     uart_hex(GET32(TCRR));
     PRINT("IRQ global habilitado\n");
+
+    PRINT("Creando scheduler...\n");
+    create_scheduler(); // Crear scheduler
 
     PRINT("Creando tabla de procesos...\n");
     create_table(); // Crear tabla de procesos
@@ -43,4 +47,7 @@ void os_main(void) {
 
     start_process(pid1); // Iniciar proceso 1
     start_process(pid2); // Iniciar proceso 2
+
+    PRINT("Iniciando scheduler...\n");
+    run_scheduler(); // Iniciar scheduler
 }

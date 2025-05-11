@@ -2,6 +2,7 @@
 #define PCB_H
 
 typedef enum {
+    CREATED,
     READY,
     RUNNING,
     BLOCKED,
@@ -16,11 +17,12 @@ typedef struct{
     void (*process_function)(void);
 } PCB;
 
+#define MAX_PROCESSES 10
+
 extern int num_processes;
 extern PCB process_table[];
 
 void create_table(void);
-int create_process(void (*function)(void));
-void start_process(unsigned int pid);
+
 
 #endif
