@@ -8,7 +8,7 @@ extern void app_main(void);
 #define UART_THR       (UART0_BASE + 0x00)
 #define UART_LSR       (UART0_BASE + 0x14)
 #define UART_LSR_THRE  0x20
-
+//timer2
 #define DMTIMER2_BASE    0x48040000
 #define TCLR             (DMTIMER2_BASE + 0x38)
 #define TCRR             (DMTIMER2_BASE + 0x3C)
@@ -19,14 +19,18 @@ extern void app_main(void);
 #define INTCPS_BASE      0x48200000
 #define INTC_MIR_CLEAR2  (INTCPS_BASE + 0xC8)
 #define INTC_CONTROL     (INTCPS_BASE + 0x48)
+#define INTC_ILR68      (INTCPS_BASE + 0x100 + (68 * 4)) // INTC_ILR68: Priority 0, IRQ not FIQ
 
 #define CM_PER_BASE      0x44E00000
 #define CM_PER_TIMER2_CLKCTRL (CM_PER_BASE + 0x80)
+//timer 3
+#define DMTIMER3_BASE    0x48042000
+#define TCLR_3           (DMTIMER3_BASE + 0x38)
+#define TISR_3           (DMTIMER2_BASE + 0x28)
+#define TCRR_3           (DMTIMER3_BASE + 0x3C)
+#define TLDR_3           (DMTIMER3_BASE + 0x40)
 
-#define UART0_BASE 0x44E09000
-#define UART_THR   (UART0_BASE + 0x00)
-#define UART_LSR   (UART0_BASE + 0x14)
-#define UART_LSR_THRE 0x20
+#define CM_PER_TIMER3_CLKCTRL (CM_PER_BASE + 0x84)
 
 void uart_send(unsigned char x) {
     while ((GET32(UART_LSR) & UART_LSR_THRE) == 0);
@@ -39,7 +43,6 @@ void uart_hex(unsigned int value) {
     }
 }
 
-
 void PRINT(const char *s) {
     while (*s) uart_send(*s++);
 }
@@ -50,7 +53,7 @@ void timer_init(void) {
 
     PRINT("Step 2: Unmask IRQ 68\n");
     PUT32(INTC_MIR_CLEAR2, 1 << (68 - 64));
-    PUT32(INTCPS_BASE + 0x110, 0x0);  // INTC_ILR68: Priority 0, IRQ not FIQ
+    PUT32(INTC_ILR68, 0x0);  // INTC_ILR68: Priority 0, IRQ not FIQ
 
     PRINT("Step 3: Stop timer\n");
     PUT32(TCLR, 0);
@@ -73,15 +76,18 @@ void timer_init(void) {
     PRINT("Timer initialized\n");
 }
 
+
+
 void timer_irq_handler(void) {
-    PUT32(TISR, 0x2);
-    
-    PUT32(INTC_CONTROL, 0x1);
     PRINT("*****************************************************Tick*************************************************************\n");
-    int i=0;
-    while(i<1000) {
-        i++;
-    }
+    // Leer el valor actual del contador del Timer 2
+    unsigned int start = GET32(TCRR);
+
+    // Esperar hasta que pasen 327680 ticks (~10 segundos a 32.768 Hz)
+    while ((GET32(TCRR) - start) < 327680);
+
+    PUT32(TISR, 0x2);
+    PUT32(INTC_CONTROL, 0x1);
 }
 
 void os_main(void) {
@@ -89,6 +95,7 @@ void os_main(void) {
 
     PRINT("Starting...\n");
     timer_init();
+    PRINT("Timer3 initialized\n");
     enable_irq();
 
     PRINT("Initial TCRR: ");
