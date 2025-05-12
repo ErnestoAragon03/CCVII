@@ -23,14 +23,6 @@ extern void app_main(void);
 
 #define CM_PER_BASE      0x44E00000
 #define CM_PER_TIMER2_CLKCTRL (CM_PER_BASE + 0x80)
-//timer 3
-#define DMTIMER3_BASE    0x48042000
-#define TCLR_3           (DMTIMER3_BASE + 0x38)
-#define TISR_3           (DMTIMER2_BASE + 0x28)
-#define TCRR_3           (DMTIMER3_BASE + 0x3C)
-#define TLDR_3           (DMTIMER3_BASE + 0x40)
-
-#define CM_PER_TIMER3_CLKCTRL (CM_PER_BASE + 0x84)
 
 void uart_send(unsigned char x) {
     while ((GET32(UART_LSR) & UART_LSR_THRE) == 0);
