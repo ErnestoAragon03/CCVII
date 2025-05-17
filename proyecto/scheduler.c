@@ -2,7 +2,7 @@
 
 PCB *current_process = NULL;
 
-void select_next_process(void) {
+void select_next_process(unsigned int* sp) {
     // Implementación del planificador
     // Aquí se selecciona el siguiente proceso a ejecutar
     // y se realiza el cambio de contexto si es necesario.
@@ -12,6 +12,7 @@ void select_next_process(void) {
     if (current_process != NULL) {
         current_process->state = READY;
         //Meterlo a la lista de espera
+        current_process->stack_pointer = sp;
         enqueue(current_process);
         current_process = NULL;
     }
@@ -26,7 +27,14 @@ void select_next_process(void) {
             PRINT("Ejecutando proceso con PID: ");
             uart_decimal(current_process->pid);
             PRINT("\n");
-            current_process->process_function();
+            if(sp != 0){
+                PRINT("Llegue a end");
+                irq_handler_end(current_process->stack_pointer);
+            }
+            else{
+                current_process->process_function();
+            }
+            
         }
     } else {
         PRINT("No hay procesos en la lista de espera.\n");
@@ -40,6 +48,7 @@ int create_process(void (*function)(void)) {
     pcb->priority = 0; // Prioridad inicial
     pcb->state = CREATED;
     pcb->process_function = function;
+    pcb->stack_pointer = 0;
     num_processes++;
     return pcb->pid;
 }
@@ -76,6 +85,6 @@ int run_scheduler(void) {
         return -1; // Error al recuperar la lista de espera
     }
     while(1){
-        select_next_process();
+        select_next_process(0);
     }    
 }

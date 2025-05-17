@@ -34,11 +34,14 @@ void timer_init(void) {
     PRINT("Timer initialized\n");
 }
 
-void timer_irq_handler(void) {
+void timer_irq_handler(unsigned int* sp) {
     PUT32(TISR, 0x2);
     
     PUT32(INTC_CONTROL, 0x1);
+    PRINT("\nSP:\n");
+    uart_hex(&sp);
     PRINT("\n*****************************************************Tick*************************************************************\n");
+    
 
-    select_next_process();
+    select_next_process(sp);
 }
