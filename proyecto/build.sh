@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "🧹 Limpiando..."
-rm -f *.o *.elf *.bin *.list
 
 echo "⚙️  Ensamblando startup.s..."
 arm-none-eabi-as startup.s -o startup.o

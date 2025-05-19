@@ -1,11 +1,13 @@
-extern void uart_send(unsigned char);
+#include "uart.h"
 
-void main_p1(void) {
+void main(void) {
+    PRINT(">>> Iniciado P1 <<<\n");
 
-        for(int i=0; i < 10; i++){
-            uart_send('0' + i);
-            uart_send('\n');
-
-            for (int j=0; j < 1000000; j++); // Esperar un poco
-        }
+    int i = 0;
+    while (1) {
+        uart_send('0' + (i % 10));
+        uart_send('\n');
+        i++;
+        for (volatile int j = 0; j < 1000000; j++);
+    }
 }

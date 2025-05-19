@@ -1,12 +1,18 @@
-extern void uart_send(unsigned char);
+#include "uart.h"
 
-void main_p2(void) {
+void main(void) {
+    PRINT(">>>P2<<<\n");
 
-        for(int i=0; i < 26; i++){
-            uart_send('0' + i + 17);
-            uart_send('\n');
+    char letra = 'a';
+    int limite = 20;  // 👈 solo 10 letras
 
-            for(int j=0; j < 1000000; j++); // Esperar un poco
-        }
+    while (limite--) {
+        uart_send(letra++);
+        uart_send('\n');
+        if (letra > 'z') letra = 'a';
+        for (volatile int j = 0; j < 1000000; j++);
+    }
 
+    // 🔴 Al terminar, entrar a bucle infinito pasivo
+    while (1);
 }
