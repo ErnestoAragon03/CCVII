@@ -3,7 +3,7 @@
 .PHONY: all os p1 p2 clean
 
 all: os p1 p2
-	@echo "✅ Build completo de todo el sistema"
+	@echo "Build completo de todo el sistema"
 
 os:
 	$(MAKE) -C os
