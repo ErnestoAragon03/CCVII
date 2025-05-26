@@ -12,7 +12,7 @@ typedef enum {
 typedef struct{
     unsigned int pid;
     unsigned int priority;
-    unsigned int stack_pointer;
+    void* stack_pointer;
     state_process state;
     void (*process_function)(void);
 } PCB;

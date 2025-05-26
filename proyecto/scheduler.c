@@ -2,43 +2,71 @@
 
 PCB *current_process = NULL;
 
-void select_next_process(unsigned int* sp) {
-    // Implementación del planificador
-    // Aquí se selecciona el siguiente proceso a ejecutar
-    // y se realiza el cambio de contexto si es necesario.
-    //PRINT("Seleccionando siguiente proceso...\n");
+void select_next_process(void* sp) {
+        // Implementación del planificador
+        // Aquí se selecciona el siguiente proceso a ejecutar
+        // y se realiza el cambio de contexto si es necesario.
 
-    //Quitar el proceso actual de ejecución (Si es que hay uno)
-    if (current_process != NULL) {
-        current_process->state = READY;
-        //Meterlo a la lista de espera
-        current_process->stack_pointer = sp;
-        enqueue(current_process);
-        current_process = NULL;
-    }
-
-    //Seleccionar el siguiente proceso
-    if (waiting_list->size > 0) {
-        current_process = dequeue();
+        //Quitar el proceso actual de ejecución (Si es que hay uno)
+        if(waiting_list == NULL) {
+            PRINT("Error: La lista de espera no ha sido creada.\n");
+        }
+        PRINT("Waiting list size: ");
+        uart_decimal(waiting_list->size);
+        PRINT("\n");
         if (current_process != NULL) {
-            current_process->state = RUNNING;
-            // Aquí se puede implementar el cambio de contexto
-            // y la ejecución del proceso seleccionado.
-            PRINT("Ejecutando proceso con PID: ");
+            PRINT("Guardando proceso actual con PID: ");
             uart_decimal(current_process->pid);
             PRINT("\n");
-            if(sp != 0){
-                PRINT("Llegue a end");
-                irq_handler_end(current_process->stack_pointer);
+            // Guardar el nuevo stack pointer
+            current_process->stack_pointer = sp;
+            // Cambiar el estado del proceso actual a READY
+            current_process->state = READY;
+            //Meterlo a la lista de espera
+            if(enqueue(current_process) == 0 ){
+                PRINT("Proceso con PID: ");
+                uart_decimal(current_process->pid);
+                PRINT(" agregado a la lista de espera.\n");
+            } else {
+                PRINT("Error al agregar el proceso a la lista de espera.\n");
+            }
+            current_process = NULL;
+        }
+        else {
+            PRINT("No hay proceso actual.\n");
+        }
+
+        //Seleccionar el siguiente proceso
+        if (waiting_list->size > 0) {
+            current_process = dequeue();
+            if (current_process != NULL) {
+                current_process->state = RUNNING;
+                PRINT("Ejecutando proceso con PID: ");
+                uart_decimal(current_process->pid);
+                PRINT("\n");
+                sp = current_process->stack_pointer;
+
+                PRINT("Con SP:");
+                uart_hex((unsigned int)sp);
+                PRINT("\n");
+                if(sp != 0){
+                    PRINT("Llegue a end ");
+                    PRINT("SP: ");
+                    uart_hex((unsigned int)sp);
+                    irq_handler_end(sp);
+                }
+                else{
+                    current_process->process_function();
+                    PRINT("Regreso\n");
+                }
+                
             }
             else{
-                current_process->process_function();
+                PRINT("Error al seleccionar el siguiente proceso.\n");
             }
-            
+        } else {
+            PRINT("No hay procesos en la lista de espera.\n");
         }
-    } else {
-        PRINT("No hay procesos en la lista de espera.\n");
-    }
 }
 
 int create_process(void (*function)(void)) {

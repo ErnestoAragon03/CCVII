@@ -47,13 +47,14 @@ vector_table:
 irq_handler:
     push {r0-r12, lr}
     mov r0, sp
-    bl timer_irq_handler
+    b timer_irq_handler
 
 .globl irq_handler_end
 irq_handler_end:
     mov sp, r0
     pop {r0-r12, lr}
-    subs pc, lr, #4
+    subs lr, lr, #4
+    bx lr
 
 .section .bss
 .align 4

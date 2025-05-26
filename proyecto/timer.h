@@ -17,7 +17,7 @@
 #define CM_PER_TIMER2_CLKCTRL (CM_PER_BASE + 0x80)
 
 void timer_init(void);
-void timer_irq_handler(unsigned int* sp);
+void timer_irq_handler(void* sp);
 
 
 
