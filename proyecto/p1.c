@@ -8,6 +8,6 @@ void main(void) {
         uart_send('0' + (i % 10));
         uart_send('\n');
         i++;
-        for (volatile int j = 0; j < 1000000; j++);
+        for (volatile int j = 0; j < 10000000; j++);
     }
 }

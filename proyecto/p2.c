@@ -13,6 +13,4 @@ void main(void) {
         for (volatile int j = 0; j < 1000000; j++);
     }
 
-    // 🔴 Al terminar, entrar a bucle infinito pasivo
-    while (1);
 }

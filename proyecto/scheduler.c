@@ -18,17 +18,18 @@ void select_next_process() {
     }
 }
 
-// ⚠️ Lanzamiento inicial del primer proceso directamente desde el OS
 void run_scheduler() {
     current_pid = 0;
     unsigned int sp_value = process_table[current_pid].stack_pointer;
 
     asm volatile(
-        "mov sp, %0\n"                 // cargar stack del proceso
-        "ldmfd sp!, {r0-r12, lr}\n"    // restaurar registros
-        "ldmfd sp!, {r1}\n"            // r1 = cpsr simulado
-        "msr spsr_cxsf, r1\n"          // cargar spsr
-        "movs pc, lr\n"                // salto al proceso con modo usuario
+        "mov sp, %0\n"                 // cargar SP del proceso
+        "ldmia sp, {r0-r12, lr}\n"     // restaurar registros generales y lr
+        "ldr r1, [sp, #64]\n"          // leer SPSR simulado del stack
+        "msr spsr_cxsf, r1\n"          // cargar SPSR
+        "add sp, sp, #68\n"            // limpiar stack simulado
+        "subs pc, lr, #4\n"            // salto final a proceso (modo usuario)
         :: "r"(sp_value)
     );
 }
+
