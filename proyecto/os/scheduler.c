@@ -1,6 +1,8 @@
 #include "scheduler.h"
-
+#include "timer.h"
+#include "pcb.h"
 PCB *current_process = NULL;
+unsigned int process_stacks[MAX_PROCESSES][STACK_SIZE];
 
 void select_next_process(void) {
     // Implementación del planificador
@@ -27,7 +29,6 @@ void select_next_process(void) {
             PRINT("Ejecutando proceso con PID: ");
             uart_decimal(current_process->pid);
             PRINT("\n");
-            current_process->process_function();
         }
     } else {
         PRINT("No hay procesos en la lista de espera.\n");
@@ -42,9 +43,31 @@ int create_process(void (*function)(void)) {
     pcb->state = CREATED;
     pcb->process_function = function;
     pcb->cpu_usage = 0; // Uso de CPU inicial
+
+    unsigned int *stack_top = &process_stacks[num_processes][STACK_SIZE - 1];
+
+    *(--stack_top) = 0x60000013;  // CPSR (modo supervisor o usuario)
+    *(--stack_top) = (unsigned int)function; // PC (inicio del proceso)
+    *(--stack_top) = 0x0; // LR
+    *(--stack_top) = 0x0; // R12
+    *(--stack_top) = 0x0; // R11
+    *(--stack_top) = 0x0; // R10
+    *(--stack_top) = 0x0; // R9
+    *(--stack_top) = 0x0; // R8
+    *(--stack_top) = 0x0; // R7
+    *(--stack_top) = 0x0; // R6
+    *(--stack_top) = 0x0; // R5
+    *(--stack_top) = 0x0; // R4
+    *(--stack_top) = 0x0; // R3
+    *(--stack_top) = 0x0; // R2
+    *(--stack_top) = 0x0; // R1
+    *(--stack_top) = 0x0; // R0
+
+    pcb->stack_pointer = (unsigned int)stack_top;
     num_processes++;
     return pcb->pid;
 }
+
 
 void start_process(unsigned int pid) {
     if(pid < 0 || pid >= num_processes) return; // PID inválido
@@ -78,6 +101,6 @@ int  run_scheduler(void) {
         return -1; // Error al recuperar la lista de espera
     }
     while(1){
-        select_next_process();
+        asm volatile ("wfi"); // Wait for interrupt
     }    
 }

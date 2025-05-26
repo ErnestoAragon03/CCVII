@@ -4,7 +4,7 @@
 .syntax unified
 .code 32
 .globl _start
-
+.equ OFFSET_SP, 12
 _start:
     ldr sp, =_stack_top        @ Inicializa el puntero de pila
     ldr r0, =vector_table
@@ -46,7 +46,30 @@ vector_table:
 
 irq_handler:
     push {r0-r12, lr}
-    bl timer_irq_handler
+    mrs r0, cpsr
+    push {r0}
+
+    ldr r1, =current_process   @ Guardar SP actual en PCB actual_process->sp
+    ldr r1, [r1]
+    cmp r1, #0
+    beq skip_save_sp
+    str sp, [r1, #OFFSET_SP]
+
+skip_save_sp:
+    bl timer_irq_handler         @ Solo limpia TISR y notifica INTC
+
+    bl select_next_process     @ Llamar al scheduler
+    
+   
+    ldr r1, =current_process    @ Cargar SP del nuevo proceso actual
+    ldr r1, [r1]
+    cmp r1, #0
+    beq skip_load_sp
+    ldr sp, [r1, #OFFSET_SP]
+
+skip_load_sp:
+    pop {r0}
+    msr cpsr_fsxc, r0
     pop {r0-r12, lr}
     subs pc, lr, #4
 

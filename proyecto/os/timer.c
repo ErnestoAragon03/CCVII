@@ -19,26 +19,24 @@ void timer_init(void) {
     PRINT("Step 4: Clear interrupts\n");
     PUT32(TISR, 0x7);
 
-    PRINT("Step 5: Set load value\n");
-    PUT32(TLDR, 0xFE91CA00);
+    PRINT("Step 5: Set load value\n");//3s de timer
+    PUT32(TLDR, 0xFFFD8F00);
 
     PRINT("Step 6: Set counter\n");
-    PUT32(TCRR, 0xFE91CA00);
+    PUT32(TCRR, 0xFFFD8F00);
 
     PRINT("Step 7: Enable overflow interrupt\n");
     PUT32(TIER, 0x2);
-
-    PRINT("Step 8: Start timer with auto-reload\n");
-    PUT32(TCLR, 0x3);
+    PRINT("Starting timer...\n");
+    PUT32(TCLR, 0x3); // Start timer with auto-reload
 
     PRINT("Timer initialized\n");
 }
+
 
 void timer_irq_handler(void) {
     PUT32(TISR, 0x2);
     
     PUT32(INTC_CONTROL, 0x1);
-    PRINT("\n*****************************************************Tick*************************************************************\n");
-
-    select_next_process();
+    PRINT("\n**************Tick******************\n");
 }

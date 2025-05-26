@@ -13,7 +13,7 @@ void os_main(void) {
     PRINT("Iniciando OS...\n");
 
     PRINT("Starting...\n");
-    timer_init();
+    
     enable_irq();
 
     PRINT("Initial TCRR: ");
@@ -47,6 +47,7 @@ void os_main(void) {
 
     start_process(pid1); // Iniciar proceso 1
     start_process(pid2); // Iniciar proceso 2
+    timer_init();
 
     PRINT("Iniciando scheduler...\n");
     run_scheduler(); // Iniciar scheduler

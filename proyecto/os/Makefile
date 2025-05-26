@@ -37,4 +37,4 @@ $(TARGET).bin: $(TARGET).elf
 
 # 🧹 Limpieza
 clean:
-	del /Q *.o *.elf *.bin libos.a 2>nul || exit 0
+	rm -f *.o *.elf *.bin libos.a

@@ -18,4 +18,4 @@ clean:
 	$(MAKE) -C os clean
 	$(MAKE) -C p1 clean
 	$(MAKE) -C p2 clean
-	@echo "🧹 Limpieza completa"
+	@echo " Limpieza completa"

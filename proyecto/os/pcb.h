@@ -19,7 +19,7 @@ typedef struct{
     void (*process_function)(void);
 } PCB;
 
-#define MAX_PROCESSES 10
+#define MAX_PROCESSES 4
 
 extern int num_processes;
 extern PCB process_table[];

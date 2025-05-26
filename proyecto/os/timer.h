@@ -18,7 +18,7 @@
 
 void timer_init(void);
 void timer_irq_handler(void);
-
+void start_timer(void);
 
 
 #endif
