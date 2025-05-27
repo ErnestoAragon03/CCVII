@@ -13,6 +13,7 @@ typedef struct{
     unsigned int pid;
     unsigned int priority;
     void* stack_pointer;
+    unsigned int stack[1024]; // Stack size of 1024 words
     state_process state;
     void (*process_function)(void);
 } PCB;

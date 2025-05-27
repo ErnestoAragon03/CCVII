@@ -47,14 +47,17 @@ vector_table:
 irq_handler:
     push {r0-r12, lr}
     mov r0, sp
-    b timer_irq_handler
-
-.globl irq_handler_end
-irq_handler_end:
+    bl timer_irq_handler
     mov sp, r0
     pop {r0-r12, lr}
-    subs lr, lr, #4
-    bx lr
+    subs pc, lr, #4
+
+.globl start_first_process
+start_first_process:
+    bl select_next_process      @ r0 = 0, obtiene el primer stack pointer
+    mov sp, r0                  @ Cambia el stack pointer
+    pop {r0-r12, lr}            @ Restaura el contexto (debe estar preparado por inicialize_stack)
+    bx lr                       @ Salta a la función del proceso
 
 .section .bss
 .align 4

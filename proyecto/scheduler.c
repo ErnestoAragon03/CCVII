@@ -2,7 +2,20 @@
 
 PCB *current_process = NULL;
 
-void select_next_process(void* sp) {
+void* initialize_stack(void (*func)(void), void* stack_base){
+     unsigned int* sp = (unsigned int*)stack_base;
+    sp += 1024; // Tope del stack
+    sp -= 14;   // 13 para r0-r12, 1 para lr
+    for (int i = 0; i < 13; i++) {
+        sp[i] = 0x0; // r0-r12
+    }
+    sp[13] = (unsigned int)func + 4; // lr
+
+    return (void*)sp;
+}
+
+
+void* select_next_process(void* sp) {
         // Implementación del planificador
         // Aquí se selecciona el siguiente proceso a ejecutar
         // y se realiza el cambio de contexto si es necesario.
@@ -44,21 +57,26 @@ void select_next_process(void* sp) {
                 PRINT("Ejecutando proceso con PID: ");
                 uart_decimal(current_process->pid);
                 PRINT("\n");
-                sp = current_process->stack_pointer;
-
                 PRINT("Con SP:");
-                uart_hex((unsigned int)sp);
+                uart_hex((unsigned int)current_process->stack_pointer);
                 PRINT("\n");
-                if(sp != 0){
-                    PRINT("Llegue a end ");
-                    PRINT("SP: ");
-                    uart_hex((unsigned int)sp);
-                    irq_handler_end(sp);
+                if(current_process->stack_pointer == current_process->stack){
+                    PRINT("Inicializando stack del proceso con PID: ");
+                    uart_decimal(current_process->pid);
+                    PRINT("\n");
+                    current_process->stack_pointer = initialize_stack(current_process->process_function, current_process->stack_pointer);
+
+                    PRINT("Base del stack del proceso: ");
+                    uart_hex((unsigned int)current_process->stack);
+                    PRINT("\nStack pointer inicializado: ");
+                    uart_hex((unsigned int)current_process->stack_pointer);
+                    PRINT("\n");
                 }
-                else{
-                    current_process->process_function();
-                    PRINT("Regreso\n");
-                }
+                
+                PRINT("Llegue a end ");
+                PRINT("SP: ");
+                uart_hex((unsigned int)current_process->stack_pointer);
+                return current_process->stack_pointer; // Retornar el stack pointer del proceso actual
                 
             }
             else{
@@ -76,7 +94,7 @@ int create_process(void (*function)(void)) {
     pcb->priority = 0; // Prioridad inicial
     pcb->state = CREATED;
     pcb->process_function = function;
-    pcb->stack_pointer = 0;
+    pcb->stack_pointer = pcb->stack; // Inicializar el stack pointer al inicio del stack
     num_processes++;
     return pcb->pid;
 }
@@ -112,7 +130,7 @@ int run_scheduler(void) {
     if (waiting_list == NULL) {
         return -1; // Error al recuperar la lista de espera
     }
-    while(1){
-        select_next_process(0);
-    }    
+    
+    start_first_process(); 
+    while(1);
 }

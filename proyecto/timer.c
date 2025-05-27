@@ -34,7 +34,10 @@ void timer_init(void) {
     PRINT("Timer initialized\n");
 }
 
-void timer_irq_handler(void* sp) {
+void* timer_irq_handler(void* sp) {
+    PRINT("Stopping timer\n");
+    PUT32(TCLR, 0x0);
+
     PUT32(TISR, 0x2);    
     PUT32(INTC_CONTROL, 0x1);
 
@@ -42,6 +45,12 @@ void timer_irq_handler(void* sp) {
     uart_hex((unsigned int)sp);
     PRINT("\n*****************************************************Tick*************************************************************\n");
     
+    void* new_sp = select_next_process(sp);
+    PRINT("\nSP del nuevo proceso:");
+    uart_hex((unsigned int)new_sp);
+    PRINT("\n");
 
-    select_next_process(sp);
+    PRINT("Starting timer\n");
+    PUT32(TCLR, 0x3);
+    return new_sp;
 }
