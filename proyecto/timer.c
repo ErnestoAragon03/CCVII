@@ -20,7 +20,7 @@ void timer_init(void) {
     PUT32(TISR, 0x7);
 
     PRINT("Step 5: Set load value\n");//3s de timer
-    PUT32(TLDR, 0xFFFD8F00);
+    PUT32(TLDR, 0xFE91CA00);
 
     PRINT("Step 6: Set counter\n");
     PUT32(TCRR, 0xFE91CA00);

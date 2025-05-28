@@ -6,7 +6,7 @@ void main_p1(void) {
             uart_send('0' + i);
             uart_send('\n');
 
-            //for (int j=0; j < 1000; j++); // Esperar un poco
+            for (int j=0; j < 100000; j++); // Esperar un poco
         }
     }
 }

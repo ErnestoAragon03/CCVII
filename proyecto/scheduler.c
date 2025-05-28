@@ -3,7 +3,7 @@
 PCB *current_process = NULL;
 
 void* initialize_stack(void (*func)(void), void* stack_base){
-     unsigned int* sp = (unsigned int*)stack_base;
+    unsigned int* sp = (unsigned int*)stack_base;
     sp += 1024; // Tope del stack
     sp -= 14;   // 13 para r0-r12, 1 para lr
     for (int i = 0; i < 13; i++) {
