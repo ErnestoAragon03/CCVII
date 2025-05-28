@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "scheduler.h": "c",
+        "uart.h": "c",
+        "p2.h": "c"
+    }
+}

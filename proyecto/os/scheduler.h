@@ -7,14 +7,13 @@
 #include "utils.h"
 
 extern PCB *current_process;
+extern void irq_handler_end(void* sp);
+extern void start_first_process(void);
 
-void select_next_process(void);
+void* select_next_process(void* sp);
 int create_process(void (*function)(void));
 void start_process(unsigned int pid);
 int create_scheduler(void);
 int run_scheduler(void);
-void save_context(PCB *p);
-void restore_context(PCB *p);
-void process_exit(void) ;
 
 #endif

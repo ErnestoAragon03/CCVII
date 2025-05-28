@@ -4,7 +4,7 @@
 .syntax unified
 .code 32
 .globl _start
-.equ OFFSET_SP, 12
+
 _start:
     ldr sp, =_stack_top        @ Inicializa el puntero de pila
     ldr r0, =vector_table
@@ -46,32 +46,18 @@ vector_table:
 
 irq_handler:
     push {r0-r12, lr}
-    mrs r0, cpsr
-    push {r0}
-
-    ldr r1, =current_process   @ Guardar SP actual en PCB actual_process->sp
-    ldr r1, [r1]
-    cmp r1, #0
-    beq skip_save_sp
-    str sp, [r1, #OFFSET_SP]
-
-skip_save_sp:
-    bl timer_irq_handler         @ Solo limpia TISR y notifica INTC
-
-    bl select_next_process     @ Llamar al scheduler
-    
-   
-    ldr r1, =current_process    @ Cargar SP del nuevo proceso actual
-    ldr r1, [r1]
-    cmp r1, #0
-    beq skip_load_sp
-    ldr sp, [r1, #OFFSET_SP]
-
-skip_load_sp:
-    pop {r0}
-    msr cpsr_fsxc, r0
+    mov r0, sp
+    bl timer_irq_handler
+    mov sp, r0
     pop {r0-r12, lr}
     subs pc, lr, #4
+
+.globl start_first_process
+start_first_process:
+    bl select_next_process      @ r0 = 0, obtiene el primer stack pointer
+    mov sp, r0                  @ Cambia el stack pointer
+    pop {r0-r12, lr}            @ Restaura el contexto (debe estar preparado por inicialize_stack)
+    bx lr                       @ Salta a la función del proceso
 
 .section .bss
 .align 4

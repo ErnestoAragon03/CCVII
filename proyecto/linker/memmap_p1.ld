@@ -1,6 +1,6 @@
 MEMORY
 {
-    code : ORIGIN = 0x80010000, LENGTH = 32K
+    code : ORIGIN = 0x80010000, LENGTH = 128K
     stack : ORIGIN = 0x80018000, LENGTH = 32K
 }
 

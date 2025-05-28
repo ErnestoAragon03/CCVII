@@ -1,7 +1,7 @@
 #ifndef WAITINGLIST_H
 #define WAITINGLIST_H
 
-
+#include "uart.h"
 #include "pcb.h"
 
 
@@ -27,5 +27,5 @@ PCB* dequeue();
 void freeWaitingList(WaitingList* list);
 void insertInOrder(WaitingList* list, PCB* newProcess);
 void reorderWaitingList(WaitingList* list);
-
+void print_waiting_list_state();
 #endif

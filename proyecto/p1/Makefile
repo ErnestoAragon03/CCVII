@@ -1,26 +1,31 @@
 TARGET = p1
 
-# 🟢 PRIMER objetivo, debe estar arriba
-all: $(TARGET).bin
+SRCS = p1.c ../os/startup_process.s ../os/uart.c
+OBJS = $(SRCS:.c=.o)
+OBJS := $(OBJS:.s=.o)
 
 CFLAGS = -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=hard \
 	-Wall -Werror -O2 -nostdlib -nostartfiles -ffreestanding
 
-$(TARGET).o: $(TARGET).c
+LDFLAGS = -T ../linker/memmap_p1.ld
+
+all: $(TARGET).bin
+
+# Compilar .c a .o
+%.o: %.c
 	arm-none-eabi-gcc -c $(CFLAGS) $< -o $@
 
-# Compila p2.o si no está hecho
-../p2/p2.o:
-	$(MAKE) -C ../p2 p2.o
+# Compilar .s a .o
+%.o: %.s
+	arm-none-eabi-as --warn --fatal-warnings $< -o $@
 
-# Enlaza el .elf con p2.o y libos.a
-$(TARGET).elf: $(TARGET).o ../os/libos.a ../p2/p2.o
-	arm-none-eabi-ld -T ../linker/memmap_p1.ld $^ -o $@
+# Linkear .o a .elf
+$(TARGET).elf: $(OBJS)
+	arm-none-eabi-ld $(LDFLAGS) $^ -o $@
 
-# Genera el .bin
+# Convertir .elf a .bin
 $(TARGET).bin: $(TARGET).elf
 	arm-none-eabi-objcopy -O binary $< $@
 
-# Limpieza
 clean:
 	rm -f *.o *.elf *.bin

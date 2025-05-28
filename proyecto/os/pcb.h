@@ -1,6 +1,5 @@
 #ifndef PCB_H
 #define PCB_H
-#define STACK_SIZE 1024
 
 typedef enum {
     CREATED,
@@ -12,14 +11,14 @@ typedef enum {
 
 typedef struct{
     unsigned int pid;
-    unsigned int cpu_usage;
     unsigned int priority;
-    unsigned int stack_pointer;
+    void* stack_pointer;
+    unsigned int* stack; // Stack size of 1024 words
     state_process state;
     void (*process_function)(void);
 } PCB;
 
-#define MAX_PROCESSES 4
+#define MAX_PROCESSES 3
 
 extern int num_processes;
 extern PCB process_table[];

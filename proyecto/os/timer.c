@@ -20,23 +20,37 @@ void timer_init(void) {
     PUT32(TISR, 0x7);
 
     PRINT("Step 5: Set load value\n");//3s de timer
-    PUT32(TLDR, 0xFFFD8F00);
+    PUT32(TLDR, 0xFE91CA00);
 
     PRINT("Step 6: Set counter\n");
-    PUT32(TCRR, 0xFFFD8F00);
+    PUT32(TCRR, 0xFE91CA00);
 
     PRINT("Step 7: Enable overflow interrupt\n");
     PUT32(TIER, 0x2);
-    PRINT("Starting timer...\n");
-    PUT32(TCLR, 0x3); // Start timer with auto-reload
+
+    PRINT("Step 8: Start timer with auto-reload\n");
+    PUT32(TCLR, 0x3);
 
     PRINT("Timer initialized\n");
 }
 
+void* timer_irq_handler(void* sp) {
+    PRINT("Stopping timer\n");
+    PUT32(TCLR, 0x0);
 
-void timer_irq_handler(void) {
-    PUT32(TISR, 0x2);
-    
+    PUT32(TISR, 0x2);    
     PUT32(INTC_CONTROL, 0x1);
-    PRINT("\n**************Tick******************\n");
+
+    PRINT("\nSP:\n");
+    uart_hex((unsigned int)sp);
+    PRINT("\n*****************************************************Tick*************************************************************\n");
+    
+    void* new_sp = select_next_process(sp); //c1619c08
+    PRINT("\nSP del nuevo proceso:");
+    uart_hex((unsigned int)new_sp);
+    PRINT("\n");
+
+    PRINT("Starting timer\n");
+    PUT32(TCLR, 0x3);
+    return new_sp;
 }

@@ -1,9 +1,8 @@
 MEMORY
 {
-    code : ORIGIN = 0x80020000, LENGTH = 32K
+    code : ORIGIN = 0x80020000, LENGTH = 64K
     stack : ORIGIN = 0x80028000, LENGTH = 32K
 }
-
 SECTIONS
 {
     . = ORIGIN(code);
