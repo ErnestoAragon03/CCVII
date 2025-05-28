@@ -2,8 +2,8 @@
 .global _start
 
 _start:
-    bl main     @ Llama a la función main del proceso (main_p1 o main_p2)
-    b .         @ Loop infinito al terminar
+    bl main     @ Llama a main del proceso (debe estar en p1.c o p2.c)
+    b .         @ Loop infinito
 
 @ Stub para PUT32 y GET32 usados por uart.c
 .global PUT32
