@@ -9,8 +9,12 @@ WaitingList* waiting_list = &static_waiting_list;
 static Node static_nodes[MAX_WAITING_NODES];
 static int free_node_index = 0;
 
+static int free_node_stack[MAX_WAITING_NODES];
+static int free_node_stack_top = -1;
+
 void reset_static_nodes() {
     free_node_index = 0;
+    free_node_stack_top = -1;
     for (int i = 0; i < MAX_WAITING_NODES; i++) {
         static_nodes[i].pcb = NULL;
         static_nodes[i].next = NULL;
@@ -28,10 +32,20 @@ WaitingList* createWaitingList() {
 
 //Enqueue a process to the waiting list
 int enqueue(PCB* pcb) {
-    if (free_node_index >= MAX_WAITING_NODES) {
-        return -1; // No hay nodos libres
+    Node*  newNode = NULL;
+    if (free_node_stack_top >= 0){
+        //Reutilizar un nodo libre de la pila
+        int idx = free_node_stack[free_node_stack_top--];
+        newNode = &static_nodes[idx];
     }
-    Node* newNode = &static_nodes[free_node_index++];
+    else if (free_node_index < MAX_WAITING_NODES) {
+        //Usa un nodo nuevo
+        newNode = &static_nodes[free_node_index++];
+    }
+    else{
+        return -1; // Error: No hay espacio en la lista de espera
+    }
+
     newNode->pcb = pcb;
     newNode->next = NULL;
 
@@ -66,16 +80,17 @@ PCB* dequeue() {
         waiting_list->rear = NULL;
     }
 
-    // "Libera" el nodo (opcional: podrías implementar una pila de nodos libres)
+    //Liberar el nodo (agregarlo a la pila de nodos libres)
+    
+    int idx = (int)(temp - static_nodes);
+    if (free_node_stack_top < MAX_WAITING_NODES - 1) {
+        free_node_stack[++free_node_stack_top] = idx;
+    }
+
     temp->pcb = NULL;
     temp->next = NULL;
 
     waiting_list->size--;
 
-    // Decrementa el índice de nodos libres
-    if (free_node_index > 0) {
-        free_node_index--;
-    }
-    
     return pcb;
 }
