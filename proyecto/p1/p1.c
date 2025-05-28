@@ -9,17 +9,27 @@ unsigned int get_pc(void) {
 
 void main_p1(void) {
     while(1){
-        for(int i=0; i < 10; i++){
-            uart_send('0' + i);
-            uart_send('\n');
-
-            for (int j=0; j < 10000000; j++); // Esperar un poco
-        }
-        unsigned int pc = get_pc();
-        uart_send('P');
-        uart_send('C');
-        uart_send(':');
-        uart_hex(pc);
+        uart_send('0' );
         uart_send('\n');
+        uart_send('1' );
+        uart_send('\n');
+        uart_send('2' );
+        uart_send('\n');
+        uart_send('3' );
+        uart_send('\n');
+        uart_send('4' );
+        uart_send('\n');
+        uart_send('5' );
+        uart_send('\n');
+        uart_send('6' );
+        uart_send('\n');
+        uart_send('7' );
+        uart_send('\n');
+        uart_send('8' );
+        uart_send('\n');
+        uart_send('9' );
+        uart_send('\n');
+        uart_send('P');uart_send('I');uart_send('P');uart_send('I');
+        for (int j=0; j < 10000000; j++); // Esperar un poco
     }
 }

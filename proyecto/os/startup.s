@@ -45,7 +45,7 @@ vector_table:
     b .
 
 irq_handler:
-    push {r0-r12, lr}
+    push {r0-r12, lr}       @ a que stack se esta pusheando aca?
     mov r0, sp
     bl timer_irq_handler
     mov sp, r0

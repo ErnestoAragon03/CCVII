@@ -6,6 +6,7 @@ OBJS := $(OBJS:.s=.o)  # convierte startup.s en startup.o
 
 P1_OBJ = ../p1/p1.o
 P2_OBJ = ../p2/p2.o
+P3_OBJ = ../p3/p3.o
 
 CFLAGS = -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=hard \
 	-Wall -Werror -O2 -nostdlib -nostartfiles -ffreestanding
@@ -28,7 +29,7 @@ libos.a: $(OBJS)
 	arm-none-eabi-ar rcs $@ $^
 
 # 🧱 ELF incluyendo p1.o y p2.o
-$(TARGET).elf: $(OBJS) $(P1_OBJ) $(P2_OBJ)
+$(TARGET).elf: $(OBJS) $(P1_OBJ) $(P2_OBJ) $(P3_OBJ) 
 	arm-none-eabi-ld $(LDFLAGS) $^ -o $@
 
 # 📦 Binario final

@@ -3,6 +3,7 @@ extern void PUT32(unsigned int, unsigned int);
 extern unsigned int GET32(unsigned int);
 #include "../p1/p1.h"
 #include "../p2/p2.h"
+#include "../p3/p3.h"
 #include "uart.h"
 #include "timer.h"
 #include "pcb.h"
@@ -45,8 +46,17 @@ void os_main(void) {
         PRINT("Error al crear proceso 2\n");
     }
 
+    int pid3 = create_process(main_p3); // Crear proceso 2
+    PRINT("Proceso 2 creado con PID: ");
+    uart_decimal(pid3);
+    PRINT("\n");
+    if (pid3 < 0) {
+        PRINT("Error al crear proceso 2\n");
+    }
+
     start_process(pid1); // Iniciar proceso 1
     start_process(pid2); // Iniciar proceso 2
+    start_process(pid3); // Iniciar proceso 2
 
     PRINT("Iniciando scheduler...\n");
     run_scheduler(); // Iniciar scheduler

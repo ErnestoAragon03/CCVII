@@ -2,5 +2,5 @@
 #define P1_H
 
 void main_p1(void);
-unsigned int get_pc(void)
+unsigned int get_pc(void);
 #endif

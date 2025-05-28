@@ -15,7 +15,7 @@ unsigned int* initialize_stack(void (*func)(void), void* stack_base_addr) {
     }
 
     sp[13] = (unsigned int)func + 4; // lr a la funcion del proceso
-    valor_LR = (unsigned int)func+4;
+    valor_LR = (unsigned int)func+4; 
     return (void*)sp;
 }
 

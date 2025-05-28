@@ -6,6 +6,7 @@
 
 .globl main_p1
 .globl main_p2
+.globl main_p3
 
 /* Estas funciones deben estar definidas en p1.c y p2.c respectivamente */
 
