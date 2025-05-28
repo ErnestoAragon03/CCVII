@@ -71,5 +71,11 @@ PCB* dequeue() {
     temp->next = NULL;
 
     waiting_list->size--;
+
+    // Decrementa el índice de nodos libres
+    if (free_node_index > 0) {
+        free_node_index--;
+    }
+    
     return pcb;
 }
