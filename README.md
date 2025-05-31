@@ -54,3 +54,40 @@ Este proyecto implementa un sistema operativo bare-metal con multiprogramación 
 - Pruebas unitarias para UART y Timer antes de integrar el planificador.
 - Pruebas de estabilidad en ejecución continua de los procesos.
 
+
+## Implementación
+
+### timer.c
+Este archivo está destinado a las funciones relacionadas con el timer del BeagleBoard.  Contiene las siguientes funciones:
+
+- void timer_init(void):
+- void timer_irq_handler(void):
+
+
+### uart.c
+Este archivo está destinado a la comunicación UART con la BeagleBoard.  Tiene las siguientes funciones:
+
+- void uart_send(unsigned char): Función encargada de
+- void uart_hex(unsigned int):
+- void PRINT(const char*):
+
+### scheduler.c
+Este archivo se encarga de todas las funciones necesarias para el scheduler de procesos del os.  Cuenta con las siguientes funciones:
+
+- 
+
+### pcb.c 
+Archivo encargado de manejar los Process Content Blocks (PCBs).  El PCB es una estructura conformada de la siguiente forma:
+- unsigned int pid:  Process ID, identificador del proceso
+- unsigned int priority: Prioridad del proceso, en caso se quiera crear un scheduler con prioridades (escalabilidad a futuro)
+- unsigned int stack_pointer: Puntero al stack del proceso por si es necesario para un context switching o alguna otra aplicación (escalabilidad a futuro)
+- state_process state:  Define el estado en el que se encuentra el proceso, state_process es una estructura propia de mi os que puede tener uno de los siguientes valores:
+- - READY
+- - RUNNING
+- - BLOCKED
+- - TERMINATED
+
+En el archivo de pcb.c además se definen funciones para interactuar con los PCBs, estas son:
+- void create_table(void): Crea una nueva tabla de PCBs, aquí es donde se almacenan todos los PCBs de los procesos actuales.
+- int create_process(void (*function)(void)): Crea un PCB nuevo para un proceso, el único argumento necesario (por el momento) es la función o handler del proceso.  El resto se define de manera automática.  Retorna el PID del PCB recién creado
+- void start_process(unsigned int pid):  Inicia la ejecución de proceso.  Recibe como argumento el PID del proceso que se quiere ejecutar.  Mientras se ejecuta el estado (state_process) del PCB se cambia a RUNNING y una vez se concluye la ejecución del proceso se cambia a TERMINATED.  No tiene ningún retorno.
